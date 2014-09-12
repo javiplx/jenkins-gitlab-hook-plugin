@@ -23,7 +23,6 @@ module GitlabWebHook
     build_now = lambda do
       process_projects Proc.new { |project, details| BuildNow.new(project).with(details) }
     end
-    get '/build_now', &build_now
     post '/build_now', &build_now
 
     private
