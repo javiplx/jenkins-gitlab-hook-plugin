@@ -3,17 +3,9 @@ require 'spec_helper'
 module GitlabWebHook
   describe BuildNow do
     let(:details) { double(RequestDetails, payload: double) }
-    let(:project) { double(Project, ignore_notify_commit?: false, buildable?: true, getQuietPeriod: double) }
+    let(:project) { double(Project, buildable?: true, getQuietPeriod: double) }
     let(:logger) { double }
     let(:subject) { BuildNow.new(project, logger) }
-
-    context 'when project configured to ignore notify commit' do
-      it 'skips the build' do
-        allow(project).to receive(:ignore_notify_commit?) { true }
-        expect(project).not_to receive(:scheduleBuild2)
-        expect(subject.with(details, GetBuildActions.new, GetBuildCause.new)).to match('configured to ignore notify commit')
-      end
-    end
 
     context 'when project not buildable' do
       it 'skips the build' do

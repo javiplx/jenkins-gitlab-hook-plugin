@@ -39,10 +39,6 @@ module GitlabWebHook
       matches_branch?(branch, exactly).tap { |matches| logger.info("project #{self} #{matches ? "matches": "doesn't match"} the #{branch} branch") }
     end
 
-    def ignore_notify_commit?
-      scm.isIgnoreNotifyCommit()
-    end
-
     def get_branch_name_parameter
       if scm.repositories.size > 0
         branch_name_param = get_default_parameters.find do |param|
