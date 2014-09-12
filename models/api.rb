@@ -20,12 +20,6 @@ module GitlabWebHook
       'Gitlab Web Hook is up and running :-)'
     end
 
-    notify_commit = lambda do
-      process_projects Proc.new { |project| NotifyCommit.new(project).call }
-    end
-    get '/notify_commit', &notify_commit
-    post '/notify_commit', &notify_commit
-
     build_now = lambda do
       process_projects Proc.new { |project, details| BuildNow.new(project).with(details) }
     end
