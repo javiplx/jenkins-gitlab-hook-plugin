@@ -1,5 +1,6 @@
-require_relative '../exceptions/not_found_exception'
-require_relative '../exceptions/configuration_exception'
+
+require 'gitlab_web_hook/exceptions'
+
 require_relative '../values/settings'
 require_relative '../values/project'
 require_relative '../services/get_jenkins_projects'

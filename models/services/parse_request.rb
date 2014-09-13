@@ -1,4 +1,6 @@
-require_relative '../exceptions/bad_request_exception'
+
+require 'gitlab_web_hook/exceptions'
+
 require_relative '../values/payload_request_details'
 
 module GitlabWebHook

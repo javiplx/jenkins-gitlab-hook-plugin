@@ -1,6 +1,6 @@
 require 'forwardable'
 
-require_relative '../exceptions/configuration_exception'
+require 'gitlab_web_hook/exceptions'
 
 include Java
 
