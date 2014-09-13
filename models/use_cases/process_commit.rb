@@ -9,12 +9,12 @@ module GitlabWebHook
       @create_project_for_branch = create_project_for_branch
     end
 
-    def with(details, action)
+    def with(details)
       projects = get_projects_to_process(details)
 
       messages = []
       projects.each do |project|
-        messages << action.call(project, details)
+        messages << BuildNow.new(project).with(details)
       end
       messages
     end
