@@ -1,8 +1,6 @@
 
 require 'gitlab_web_hook'
 
-require_relative '../services/get_jenkins_projects'
-
 include Java
 
 java_import Java.hudson.plugins.git.GitSCM

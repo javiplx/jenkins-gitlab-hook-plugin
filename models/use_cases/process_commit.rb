@@ -1,8 +1,7 @@
 
-require 'gitlab_web_hook/values'
+require 'gitlab_web_hook'
 
 require_relative 'create_project_for_branch'
-require_relative '../services/get_jenkins_projects'
 
 module GitlabWebHook
   class ProcessCommit

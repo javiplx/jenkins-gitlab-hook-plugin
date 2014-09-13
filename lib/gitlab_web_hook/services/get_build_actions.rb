@@ -1,4 +1,5 @@
-require_relative 'get_parameters_values'
+
+require 'gitlab_web_hook/services/get_parameters_values'
 
 include Java
 

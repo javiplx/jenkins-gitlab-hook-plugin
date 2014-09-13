@@ -1,9 +1,5 @@
 
-require 'gitlab_web_hook/values'
-
-require_relative '../services/get_jenkins_projects'
-require_relative '../services/get_build_cause'
-require_relative '../services/get_build_actions'
+require 'gitlab_web_hook'
 
 include Java
 

@@ -1,7 +1,5 @@
 
-require 'gitlab_web_hook/values'
-
-require_relative '../services/get_jenkins_projects'
+require 'gitlab_web_hook'
 
 module GitlabWebHook
   class ProcessDeleteCommit
