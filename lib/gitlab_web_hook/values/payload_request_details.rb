@@ -1,4 +1,4 @@
-require_relative '../services/flat_keys_hash'
+require 'gitlab_web_hook/values/flat_keys_hash'
 
 module GitlabWebHook
   class PayloadRequestDetails

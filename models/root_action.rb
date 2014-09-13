@@ -1,10 +1,9 @@
 
-require 'gitlab_web_hook/exceptions'
+require 'gitlab_web_hook'
 
 require_relative 'unprotected_root_action'
 require 'sinatra/base'
 
-require_relative 'values/payload_request_details'
 require_relative 'use_cases/process_commit'
 require_relative 'use_cases/process_delete_commit'
 

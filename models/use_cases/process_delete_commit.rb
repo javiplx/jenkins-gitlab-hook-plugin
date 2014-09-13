@@ -1,4 +1,6 @@
-require_relative '../values/settings'
+
+require 'gitlab_web_hook/values'
+
 require_relative '../services/get_jenkins_projects'
 
 module GitlabWebHook

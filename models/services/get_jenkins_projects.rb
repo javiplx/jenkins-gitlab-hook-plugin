@@ -1,8 +1,5 @@
 
-require 'gitlab_web_hook/exceptions'
-
-require_relative '../values/settings'
-require_relative '../values/project'
+require 'gitlab_web_hook'
 
 include Java
 

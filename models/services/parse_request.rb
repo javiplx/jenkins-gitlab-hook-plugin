@@ -1,7 +1,5 @@
 
-require 'gitlab_web_hook/exceptions'
-
-require_relative '../values/payload_request_details'
+require 'gitlab_web_hook'
 
 module GitlabWebHook
   class ParseRequest

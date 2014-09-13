@@ -1,5 +1,7 @@
+
+require 'gitlab_web_hook/values'
+
 require_relative 'create_project_for_branch'
-require_relative '../values/settings'
 require_relative '../services/get_jenkins_projects'
 
 module GitlabWebHook

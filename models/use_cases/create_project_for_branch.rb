@@ -1,8 +1,6 @@
 
-require 'gitlab_web_hook/exceptions'
+require 'gitlab_web_hook'
 
-require_relative '../values/settings'
-require_relative '../values/project'
 require_relative '../services/get_jenkins_projects'
 
 include Java
