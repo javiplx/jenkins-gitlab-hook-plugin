@@ -49,7 +49,7 @@ module GitlabWebHook
     end
 
     def parse_request
-      details = ParseRequest.new.from(request)
+      details = ParseRequest.new.from(request.body.read)
       LOGGER.info("gitlab web hook triggered for repo url #{details.repository_url} and #{details.branch} branch")
       LOGGER.info("with payload: #{details.payload}")
       details
