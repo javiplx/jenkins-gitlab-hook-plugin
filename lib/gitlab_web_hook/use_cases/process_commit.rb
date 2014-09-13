@@ -1,8 +1,6 @@
 
 require 'gitlab_web_hook'
 
-require_relative 'create_project_for_branch'
-
 module GitlabWebHook
   class ProcessCommit
     def initialize(get_jenkins_projects = GetJenkinsProjects.new, create_project_for_branch = CreateProjectForBranch.new)
