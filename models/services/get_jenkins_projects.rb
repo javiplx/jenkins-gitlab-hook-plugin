@@ -36,12 +36,12 @@ module GitlabWebHook
     def master(details)
       settings = Java.jenkins.model.Jenkins.instance.descriptor GitlabWebHookRootActionDescriptor.java_class
       projects = all.select do |project|
-        project.matches?(details.repository_uri, Settings.any_branch_pattern, details.full_branch_reference)
+        project.matches?(details.repository_uri, settings.any_branch_pattern, details.full_branch_reference)
       end
 
       # find project for the repo and master branch
       # use any other branch matching the repo
-      projects.find { |project| project.matches?(details.repository_uri, Settings.master_branch, details.full_branch_reference, true) } || projects.first
+      projects.find { |project| project.matches?(details.repository_uri, settings.master_branch, details.full_branch_reference, true) } || projects.first
     end
 
     private
