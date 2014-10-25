@@ -3,12 +3,6 @@ require 'spec_helper'
 require 'models/root_action_descriptor'
 
 module GitlabWebHook
-
-  module PluginManager
-  end
-  module PluginWrapper
-  end
-
   describe CreateProjectForBranch do
     let(:details) { double(RequestDetails, repository_name: 'discourse', safe_branch: 'features_meta', branch: 'features/meta', repository_homepage: 'http://gitlab.com/group/discourse') }
     let(:jenkins_project) { double(AbstractProject) }
@@ -65,8 +59,8 @@ module GitlabWebHook
 
       context 'returns a new project' do
 
-        let(:plugin_manager) { double(PluginManager) }
-        let(:gitplugin) { double(PluginWrapper) }
+        let(:plugin_manager) { double() }
+        let(:gitplugin) { double() }
 
         before(:each) do
           expect(jenkins_instance).to receive(:copy).with(jenkins_project, anything).and_return(new_jenkins_project)
