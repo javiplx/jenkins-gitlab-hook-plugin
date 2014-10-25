@@ -3,8 +3,14 @@ require 'spec_helper'
 require 'models/root_action_descriptor'
 
 module GitlabWebHook
+
+  module PluginManager
+  end
+  module PluginWrapper
+  end
+
   describe CreateProjectForBranch do
-    let(:details) { double(RequestDetails, repository_name: 'discourse', safe_branch: 'features_meta') }
+    let(:details) { double(RequestDetails, repository_name: 'discourse', safe_branch: 'features_meta', branch: 'features/meta', repository_homepage: 'http://gitlab.com/group/discourse') }
     let(:jenkins_project) { double(AbstractProject) }
     let(:master) { double(Project, name: 'discourse', jenkins_project: jenkins_project) }
     let(:get_jenkins_projects) { double(GetJenkinsProjects, master: master, named: []) }
@@ -57,12 +63,34 @@ module GitlabWebHook
         expect { subject.with(details) }.to raise_exception(ConfigurationException)
       end
 
-      it 'returns a new project' do
-        expect(jenkins_instance).to receive(:copy).with(jenkins_project, anything).and_return(new_jenkins_project)
-        allow(subject).to receive(:prepare_scm_from) { double(GitSCM) }
-        branch_project = subject.with(details)
-        expect(branch_project).to be_kind_of(Project)
-        expect(branch_project.jenkins_project).to eq(new_jenkins_project)
+      context 'returns a new project' do
+
+        let(:plugin_manager) { double(PluginManager) }
+        let(:gitplugin) { double(PluginWrapper) }
+
+        before(:each) do
+          expect(jenkins_instance).to receive(:copy).with(jenkins_project, anything).and_return(new_jenkins_project)
+          expect(jenkins_instance).to receive(:getPluginManager).and_return(plugin_manager)
+          expect(plugin_manager).to receive(:getPlugin).with('git').and_return(gitplugin)
+          expect(GitSCM).to receive('new')
+        end
+
+        it 'with git plugin < 2.0' do
+          expect(gitplugin).to receive(:isOlderThan) { true }
+          branch_project = subject.with(details)
+          expect(branch_project).to be_kind_of(Project)
+          expect(branch_project.jenkins_project).to eq(new_jenkins_project)
+        end
+
+        it 'with git plugin >= 2.0' do
+          expect(gitplugin).to receive(:isOlderThan) { false }
+          allow(UserRemoteConfig).to receive('new').with(anything, anything, anything, anything)
+          allow(remote_config).to receive(:getCredentialsId) { 'sha_id' }
+          branch_project = subject.with(details)
+          expect(branch_project).to be_kind_of(Project)
+          expect(branch_project.jenkins_project).to eq(new_jenkins_project)
+        end
+
       end
     end
   end
