@@ -24,6 +24,10 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
         @description = xmldoc.root.elements['description'].text
         @any_branch_pattern = xmldoc.root.elements['any_branch_pattern'].text
 
+        @templates = get_templates xmldoc.root.elements['templates']
+        @group_templates = get_templates xmldoc.root.elements['group_templates']
+        @template = xmldoc.root.elements['template'] && xmldoc.root.elements['template'].text
+
       end
     end
 
@@ -43,6 +47,20 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
       doc.root.add_element( 'use_master_project_name' ).add_text( use_master_project_name.to_s )
       doc.root.add_element( 'description' ).add_text( description )
       doc.root.add_element( 'any_branch_pattern' ).add_text( any_branch_pattern )
+
+      tpls = doc.root.add_element( 'templates' )
+      templated_jobs.each do |k,v|
+        new = tpls.add_element('template')
+        new.add_element('string').add_text(k)
+        new.add_element('project').add_text(v)
+      end
+
+      tpls = doc.root.add_element( 'group_templates' )
+      templated_groups.each do |k,v|
+        new = tpls.add_element('template')
+        new.add_element('string').add_text(k)
+        new.add_element('project').add_text(v)
+      end
 
       f = File.open(configFile.file.canonicalPath, 'wb')
       f.puts("<?xml version='#{doc.version}' encoding='#{doc.encoding}'?>")
@@ -77,6 +95,18 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
       @any_branch_pattern || "**"
     end
 
+    def templated_jobs
+      @templates || {}
+    end
+
+    def templated_groups
+      @group_templates || {}
+    end
+
+    def template_fallback
+      @template
+    end
+
     private
 
     def parse(form)
@@ -87,6 +117,14 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
         @description                = form["autocreate"]["description"]
         @any_branch_pattern         = form["autocreate"]["any_branch_pattern"]
       end
+      @templates = form['templates'] && form['templates'].inject({}) do |hash, item|
+        hash[item['string']] = item['project']
+        hash
+      end
+      @group_templates = form['group_templates'] && form['group_templates'].inject({}) do |hash, item|
+        hash[item['string']] = item['project']
+        hash
+      end
     end
 
     def automatic_project_creation
@@ -95,6 +133,14 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
 
     def use_master_project_name
       @use_master_project_name.nil? ? false : @use_master_project_name
+    end
+
+    def get_templates(templates)
+      return unless templates
+      templates.elements.select{ |tpl| tpl.name == 'template' }.inject({}) do |hash, tpl|
+        hash[tpl.elements['string'].text] = tpl.elements['project'].text
+        hash
+      end
     end
 
 end

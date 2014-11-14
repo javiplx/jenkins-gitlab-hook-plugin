@@ -17,14 +17,11 @@ java_import Java.hudson.plugins.git.util.DefaultBuildChooser
 
 module GitlabWebHook
   class GetJenkinsProjects
-    def matching(details, exactly = false)
-      all.select do |project|
-        project.matches?(details.repository_uri, details.branch, details.full_branch_reference, exactly)
-      end
-    end
 
-    def exactly_matching(details)
-      matching(details, true)
+    def matching_uri(details)
+      all.select do |project|
+        project.matches_uri?(details.repository_uri)
+      end
     end
 
     def named(name)
@@ -36,12 +33,12 @@ module GitlabWebHook
     def master(details)
       settings = Java.jenkins.model.Jenkins.instance.descriptor GitlabWebHookRootActionDescriptor.java_class
       projects = all.select do |project|
-        project.matches?(details.repository_uri, settings.any_branch_pattern, details.full_branch_reference)
+        project.matches?(details, settings.any_branch_pattern)
       end
 
       # find project for the repo and master branch
       # use any other branch matching the repo
-      projects.find { |project| project.matches?(details.repository_uri, settings.master_branch, details.full_branch_reference, true) } || projects.first
+      projects.find { |project| project.matches?(details, settings.master_branch, true) } || projects.first
     end
 
     private

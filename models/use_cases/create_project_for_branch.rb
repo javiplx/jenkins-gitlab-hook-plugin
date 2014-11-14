@@ -35,11 +35,31 @@ module GitlabWebHook
       Project.new(branch_project)
     end
 
+    def from_template(template, details)
+      # NOTE : returned value is an instance GitlabWebHook::Project, with some methods delegated to real jenkins object
+      copy_from = get_template_project(template)
+      new_project_name = details.repository_name
+      raise ConfigurationException.new("project #{new_project_name} already created from #{template}") unless @get_jenkins_projects.named(new_project_name).empty?
+      modified_scm = prepare_scm_from(copy_from.scm, details, true)
+
+      branch_project = Java.jenkins.model.Jenkins.instance.copy(copy_from.jenkins_project, new_project_name)
+      branch_project.scm = modified_scm
+      branch_project.makeDisabled(false)
+      branch_project.save
+      Project.new(branch_project)
+    end
+
     private
 
     def get_project_to_copy_from(details)
       master_not_found_message = 'could not determine master project, please create a project for the repo (usually for the master branch)'
       @get_jenkins_projects.master(details) || raise(NotFoundException.new(master_not_found_message))
+    end
+
+    def get_template_project(template)
+      candidates = @get_jenkins_projects.named(template)
+      raise NotFoundException.new("could not found template '#{template}'") if candidates.empty?
+      candidates.first
     end
 
     def get_new_project_name(copy_from, details)
@@ -48,18 +68,25 @@ module GitlabWebHook
       new_project_name
     end
 
-    def prepare_scm_from(source_scm, details)
+    def prepare_scm_from(source_scm, details, is_template=false)
       scm_name = source_scm.getScmName() && source_scm.getScmName().size > 0 ? "#{source_scm.getScmName()}_#{details.safe_branch}" : nil
 
       # refspec is skipped, we will build specific commit branch
       remote_url, remote_name, remote_refspec = nil, nil, nil
-      source_scm.getUserRemoteConfigs().first.tap do |config|
-        remote_url = config.getUrl()
-        remote_name = config.getName()
-      end
-      raise ConfigurationException.new('remote repo clone url not found') unless remote_url
+      scm_config = source_scm.getUserRemoteConfigs().first
 
-      remote_branch = remote_name && remote_name.size > 0 ? "#{remote_name}/#{details.branch}" : details.branch
+      if is_template
+        remote_url = details.repository_url
+        branchlist = source_scm.getBranches()
+      else
+        remote_url = scm_config.getUrl()
+        remote_branch = remote_name && remote_name.size > 0 ? "#{remote_name}/#{details.branch}" : details.branch
+        branchlist = [BranchSpec.new(remote_branch)]
+      end
+
+      remote_name = scm_config.getName()
+      remote_refspec = scm_config.getRefspec()
+      raise ConfigurationException.new('remote repo clone url not found') unless remote_url
 
       legacy = VersionNumber.new( "1.9.9" )
       gitplugin = Java.jenkins.model.Jenkins.instance.getPluginManager().getPlugin('git')
@@ -68,7 +95,7 @@ module GitlabWebHook
         GitSCM.new(
           scm_name,
           [UserRemoteConfig.new(remote_url, remote_name, remote_refspec)],
-          [BranchSpec.new(remote_branch)],
+          branchlist,
           source_scm.getUserMergeOptions(),
           source_scm.getDoGenerate(),
           source_scm.getSubmoduleCfg(),
@@ -98,7 +125,7 @@ module GitlabWebHook
         remote_credentials = source_scm.getUserRemoteConfigs().first.getCredentialsId()
         GitSCM.new(
           [UserRemoteConfig.new(remote_url, remote_name, remote_refspec, remote_credentials)],
-          [BranchSpec.new(remote_branch)],
+          branchlist,
           source_scm.isDoGenerateSubmoduleConfigurations(),
           source_scm.getSubmoduleCfg(),
           source_scm.getBrowser(),

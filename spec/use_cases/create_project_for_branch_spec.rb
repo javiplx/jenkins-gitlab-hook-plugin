@@ -42,7 +42,7 @@ module GitlabWebHook
     end
 
     context 'when creating the branch project' do
-      let(:remote_config) { double(getUrl: 'http://localhost/diaspora', getName: 'Diaspora') }
+      let(:remote_config) { double(getUrl: 'http://localhost/diaspora', getName: 'Diaspora', getRefspec: ['+refs/heads/*:refs/remotes/origin/*']) }
       let(:source_scm) { double(getScmName: 'git', getUserRemoteConfigs: [remote_config]).as_null_object }
       let(:jenkins_instance) { double(Java.jenkins.model.Jenkins) }
       let(:new_jenkins_project) { double(AbstractProject).as_null_object }
@@ -66,6 +66,7 @@ module GitlabWebHook
           expect(jenkins_instance).to receive(:copy).with(jenkins_project, anything).and_return(new_jenkins_project)
           expect(jenkins_instance).to receive(:getPluginManager).and_return(plugin_manager)
           expect(plugin_manager).to receive(:getPlugin).with('git').and_return(gitplugin)
+          expect(UserRemoteConfig).to receive('new')
           expect(GitSCM).to receive('new')
         end
 
@@ -78,7 +79,6 @@ module GitlabWebHook
 
         it 'with git plugin >= 2.0' do
           expect(gitplugin).to receive(:isOlderThan) { false }
-          allow(UserRemoteConfig).to receive('new').with(anything, anything, anything, anything)
           allow(remote_config).to receive(:getCredentialsId) { 'sha_id' }
           branch_project = subject.with(details)
           expect(branch_project).to be_kind_of(Project)
