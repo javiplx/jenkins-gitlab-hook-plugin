@@ -81,7 +81,7 @@ module GitlabWebHook
       else
         remote_url = scm_config.getUrl()
         remote_branch = remote_name && remote_name.size > 0 ? "#{remote_name}/#{details.branch}" : details.branch
-        branchlist = [BranchSpec.new(remote_branch)]
+        branchlist = java.util.ArrayList.new([BranchSpec.new(remote_branch).java_object])
       end
 
       remote_name = scm_config.getName()
@@ -94,7 +94,7 @@ module GitlabWebHook
       if gitplugin.isOlderThan( legacy )
         GitSCM.new(
           scm_name,
-          [UserRemoteConfig.new(remote_url, remote_name, remote_refspec)],
+          java.util.ArrayList.new([UserRemoteConfig.new(remote_url, remote_name, remote_refspec).java_object]),
           branchlist,
           source_scm.getUserMergeOptions(),
           source_scm.getDoGenerate(),
@@ -124,7 +124,7 @@ module GitlabWebHook
       else
         remote_credentials = source_scm.getUserRemoteConfigs().first.getCredentialsId()
         GitSCM.new(
-          [UserRemoteConfig.new(remote_url, remote_name, remote_refspec, remote_credentials)],
+          java.util.ArrayList.new([UserRemoteConfig.new(remote_url, remote_name, remote_refspec, remote_credentials).java_object]),
           branchlist,
           source_scm.isDoGenerateSubmoduleConfigurations(),
           source_scm.getSubmoduleCfg(),
