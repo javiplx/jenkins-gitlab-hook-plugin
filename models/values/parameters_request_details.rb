@@ -53,5 +53,12 @@ module GitlabWebHook
       return false unless delete
       delete.to_s != "0" || delete
     end
+
+    private
+
+    def kind
+      'parameters'
+    end
+
   end
 end

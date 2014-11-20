@@ -40,6 +40,10 @@ module GitlabWebHook
 
     private
 
+    def kind
+      'webhook'
+    end
+
     def get_commits
       @commits ||= payload["commits"].to_a.map do |commit|
         Commit.new(commit["url"], commit["message"])
