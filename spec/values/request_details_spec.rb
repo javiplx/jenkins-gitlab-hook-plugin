@@ -16,6 +16,18 @@ module GitlabWebHook
       end
     end
 
+    context '#extended?' do
+      it 'is false' do
+        expect(subject.extended?).to eq(false)
+      end
+    end
+
+    context '#kind' do
+      it 'is push webhook' do
+        expect(subject.kind).to raise_exception(NoMethodError)
+      end
+    end
+
     context 'with repository uri' do
       it 'returns uri regardless of repository url' do
         ['http://repo.url', nil, '', '  \n  '].each do |repository_url|

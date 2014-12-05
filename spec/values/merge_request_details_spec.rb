@@ -12,6 +12,18 @@ module GitlabWebHook
       end
     end
 
+    context '#extended?' do
+      it 'is true' do
+        expect(subject.extended?).to eq(true)
+      end
+    end
+
+    context '#kind' do
+      it 'is merge request' do
+        expect(subject.kind).to eq('merge_request')
+      end
+    end
+
     context '#project_id' do
       it 'parsed from payload' do
         expect(subject.project_id).to eq('14')

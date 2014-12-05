@@ -11,6 +11,12 @@ module GitlabWebHook
       end
     end
 
+    context '#kind' do
+      it 'is push webhook' do
+        expect(subject.kind).to eq('push')
+      end
+    end
+
     context 'with repository url' do
       it 'extracts from payload' do
         expect(subject.repository_url).to eq('git@example.com:diaspora.git')

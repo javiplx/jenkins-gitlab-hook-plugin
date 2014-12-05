@@ -11,6 +11,12 @@ module GitlabWebHook
       end
     end
 
+    context '#kind' do
+      it 'is parameters' do
+        expect(subject.kind).to eq('parameters')
+      end
+    end
+
     context 'with repository url' do
       it 'extracts from parameters' do
         expect(subject.repository_url).to eq('http://localhost/peronospora')
