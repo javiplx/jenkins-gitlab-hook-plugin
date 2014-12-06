@@ -26,7 +26,8 @@ module GitlabWebHook
       end
 
       it 'returns empty when no source project found' do
-        payload.delete('project_id')
+        payload['object_attributes'].delete('source_project_id')
+        payload['object_attributes'].delete('target_project_id')
         expect(subject.project_id).to eq('')
       end
     end
@@ -71,7 +72,7 @@ module GitlabWebHook
       end
 
       it 'returns empty when no source branch found' do
-        payload.delete('source_branch')
+        payload['object_attributes'].delete('source_branch')
         expect(subject.source_branch).to eq('')
       end
     end
@@ -82,7 +83,8 @@ module GitlabWebHook
       end
 
       it 'returns empty when no target project found' do
-        payload.delete('target_project_id')
+        payload['object_attributes'].delete('source_project_id')
+        payload['object_attributes'].delete('target_project_id')
         expect(subject.target_project_id).to eq('')
       end
     end
@@ -93,7 +95,7 @@ module GitlabWebHook
       end
 
       it 'returns empty when no target branch found' do
-        payload.delete('target_branch')
+        payload['object_attributes'].delete('target_branch')
         expect(subject.target_branch).to eq('')
       end
     end
@@ -104,7 +106,7 @@ module GitlabWebHook
       end
 
       it 'returns empty when no state data found' do
-        payload.delete('state')
+        payload['object_attributes'].delete('state')
         expect(subject.state).to eq('')
       end
     end
@@ -115,7 +117,7 @@ module GitlabWebHook
       end
 
       it 'returns empty when no merge status data found' do
-        payload.delete('merge_status')
+        payload['object_attributes'].delete('merge_status')
         expect(subject.merge_status).to eq('')
       end
     end

@@ -18,27 +18,33 @@ module GitlabWebHook
     end
 
     def project_id
+      return "" unless payload['source_project_id']
       payload['source_project_id'].to_s
     end
 
     def source_branch
-     payload['source_branch']
+      return "" unless payload['source_branch']
+      payload['source_branch']
     end
 
     def target_project_id
+      return "" unless payload['target_project_id']
       payload['target_project_id'].to_s
     end
 
     def target_branch
-     payload['target_branch']
+      return "" unless payload['target_branch']
+      payload['target_branch']
     end
 
     def state
-     payload['state']
+      return "" unless payload['state']
+      payload['state']
     end
 
     def merge_status
-     payload['merge_status']
+      return "" unless payload['merge_status']
+      payload['merge_status']
     end
 
     def repository_url
