@@ -1,4 +1,4 @@
-require_relative 'request_details'
+require_relative 'abstract_details'
 require_relative '../exceptions/bad_request_exception'
 
 require 'net/http'

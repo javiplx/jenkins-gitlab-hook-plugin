@@ -1,3 +1,4 @@
+require_relative 'abstract_details'
 require_relative '../services/flat_keys_hash'
 
 module GitlabWebHook
