@@ -52,6 +52,17 @@ module GitlabWebHook
       end
     end
 
+    context '#target_project_id' do
+      it 'parsed from payload' do
+        expect(subject.target_project_id).to eq('14')
+      end
+
+      it 'returns empty when no source project found' do
+        payload.delete('target_project_id')
+        expect(subject.target_project_id).to eq('')
+      end
+    end
+
     context '#target_branch' do
       it 'parsed from payload' do
         expect(subject.target_branch).to eq('master')
