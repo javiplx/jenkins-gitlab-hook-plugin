@@ -5,6 +5,7 @@ module GitlabWebHook
     attr_reader :parameters
 
     def initialize(parameters)
+      @kind = 'parameters'
       @parameters = parameters || raise(ArgumentError.new("request parameters are required"))
     end
 
@@ -52,12 +53,6 @@ module GitlabWebHook
       end
       return false unless delete
       delete.to_s != "0" || delete
-    end
-
-    private
-
-    def kind
-      'parameters'
     end
 
   end

@@ -3,6 +3,7 @@ require_relative 'request_details'
 module GitlabWebHook
   class PayloadRequestDetails < RequestDetails
     def initialize(payload)
+      @kind = 'webhook'
       @payload = payload || raise(ArgumentError.new("request payload is required"))
     end
 
@@ -39,10 +40,6 @@ module GitlabWebHook
     end
 
     private
-
-    def kind
-      'webhook'
-    end
 
     def get_commits
       @commits ||= payload["commits"].to_a.map do |commit|

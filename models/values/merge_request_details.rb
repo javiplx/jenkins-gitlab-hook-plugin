@@ -12,7 +12,7 @@ module GitlabWebHook
     end
 
     def valid?
-      @kind == 'merge_request'
+      kind == 'merge_request'
     end
 
     def project_id

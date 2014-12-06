@@ -2,6 +2,9 @@ require_relative '../services/flat_keys_hash'
 
 module GitlabWebHook
   class RequestDetails
+
+    attr_accessor :kind
+
     def valid?
       classic?
     end
@@ -75,10 +78,6 @@ module GitlabWebHook
     end
 
     private
-
-    def kind
-      raise NameError.new("should be implemented in concrete implementation")
-    end
 
     def get_commits
     end

@@ -11,10 +11,12 @@ module GitlabWebHook
       end
     end
 
-    context '#classic?' do
-      it 'is true' do
-        expect(subject.classic?).to eq(true)
-      end
+    it '#classic? is true' do
+      expect(subject.classic?).to eq(true)
+    end
+
+    it '#kind is parameter request' do
+      expect(subject.kind).to eq('parameters')
     end
 
     context 'with repository url' do
