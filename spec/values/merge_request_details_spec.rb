@@ -12,15 +12,9 @@ module GitlabWebHook
       end
     end
 
-    context '#extended?' do
+    context '#classic?' do
       it 'is true' do
-        expect(subject.extended?).to eq(true)
-      end
-    end
-
-    context '#kind' do
-      it 'is merge request' do
-        expect(subject.kind).to eq('merge_request')
+        expect(subject.classic?).to eq(false)
       end
     end
 
