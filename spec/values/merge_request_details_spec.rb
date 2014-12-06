@@ -31,7 +31,7 @@ module GitlabWebHook
 
     context '#repository_url' do
       it 'returns ssh url for repository' do
-        expect(subject.project_id).to eq('git@localhost:peronospora.git')
+        expect(subject.repository_url).to eq('git@localhost:peronospora.git')
       end
     end
 
