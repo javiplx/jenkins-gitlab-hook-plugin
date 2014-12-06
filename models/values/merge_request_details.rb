@@ -4,7 +4,7 @@ require_relative '../exceptions/bad_request_exception'
 require 'net/http'
 
 module GitlabWebHook
-  class MergeRequestDetails < RequestDetails
+  class MergeRequestDetails < AbstractDetails
 
     def initialize(payload)
       raise(ArgumentError.new("request payload is required")) unless payload
@@ -22,7 +22,7 @@ module GitlabWebHook
       payload['source_project_id'].to_s
     end
 
-    def source_branch
+    def branch
       return "" unless payload['source_branch']
       payload['source_branch']
     end

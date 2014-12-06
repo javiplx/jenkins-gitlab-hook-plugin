@@ -54,26 +54,14 @@ module GitlabWebHook
 
     end
 
-    context '#full_branch_reference' do
-      it 'returns for repository' do
-        expect(subject.full_branch_reference).to eq('ms-viewport')
-      end
-    end
-
-    context '#delete_branch_commit?' do
-      it 'returns for repository' do
-        expect(subject.delete_branch_commit?).to eq(false)
-      end
-    end
-
-    context '#source_branch' do
-      it 'parsed from payload' do
-        expect(subject.source_branch).to eq('ms-viewport')
+    context '#branch' do
+      it 'returns source branch' do
+        expect(subject.branch).to eq('ms-viewport')
       end
 
       it 'returns empty when no source branch found' do
         payload['object_attributes'].delete('source_branch')
-        expect(subject.source_branch).to eq('')
+        expect(subject.branch).to eq('')
       end
     end
 
