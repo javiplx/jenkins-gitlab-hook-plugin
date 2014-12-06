@@ -120,5 +120,24 @@ module GitlabWebHook
       end
     end
 
+    context 'new payload for merge requests' do
+
+      let (:payload) { JSON.parse(File.read('spec/fixtures/new_merge_request_payload.json')) }
+      let (:subject) { MergeRequestDetails.new(payload) }
+
+      it '#repository_url returns ssh url for repository' do
+        expect(subject.repository_url).to eq('git@example.com:awesome_space/awesome_project.git')
+      end
+
+      it '#repository_name returns repository name' do
+        expect(subject.repository_name).to eq('awesome_project')
+      end
+
+      it '#repository_homepage returns homepage for repository' do
+        expect(subject.repository_homepage).to eq('http://example.com/awesome_space/awesome_project.git')
+      end
+
+    end
+
   end
 end
