@@ -15,5 +15,16 @@ module GitlabWebHook
       @kind == 'merge_request'
     end
 
+    private
+
+    def throw_cross_repo_exception
+      message = "Cross-repo merge requests not supported"
+      raise BadRequestException.new(message)
+    end
+
+    def get_payload
+      @payload
+    end
+
   end
 end
