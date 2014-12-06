@@ -66,7 +66,8 @@ module GitlabWebHook
           expect(jenkins_instance).to receive(:copy).with(jenkins_project, anything).and_return(new_jenkins_project)
           expect(jenkins_instance).to receive(:getPluginManager).and_return(plugin_manager)
           expect(plugin_manager).to receive(:getPlugin).with('git').and_return(gitplugin)
-          expect(UserRemoteConfig).to receive('new')
+          expect(UserRemoteConfig).to receive('new').and_return(remote_config)
+          expect(remote_config).to receive('java_object').and_return(double)
           expect(GitSCM).to receive('new')
         end
 
