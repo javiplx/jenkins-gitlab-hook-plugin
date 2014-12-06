@@ -57,7 +57,7 @@ module GitlabWebHook
         expect(subject.target_project_id).to eq('14')
       end
 
-      it 'returns empty when no source project found' do
+      it 'returns empty when no target project found' do
         payload.delete('target_project_id')
         expect(subject.target_project_id).to eq('')
       end
@@ -68,7 +68,7 @@ module GitlabWebHook
         expect(subject.target_branch).to eq('master')
       end
 
-      it 'returns empty when no target_branch found' do
+      it 'returns empty when no target branch found' do
         payload.delete('target_branch')
         expect(subject.target_branch).to eq('')
       end
