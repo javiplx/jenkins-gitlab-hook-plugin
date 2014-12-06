@@ -29,27 +29,9 @@ module GitlabWebHook
       end
     end
 
-    context 'with repository url' do
-      it 'expects to implemented in concrete implementation' do
-        expect { subject.repository_url }.to raise_exception(NameError)
-      end
-    end
-
-    context 'with repository name' do
-      it 'expects to implemented in concrete implementation' do
-        expect { subject.repository_url }.to raise_exception(NameError)
-      end
-    end
-
-    context 'with repository homepage' do
-      it 'expects to implemented in concrete implementation' do
-        expect { subject.repository_url }.to raise_exception(NameError)
-      end
-    end
-
     context 'with full branch name' do
       it 'expects to implemented in concrete implementation' do
-        expect { subject.repository_url }.to raise_exception(NameError)
+        expect { subject.full_branch_reference }.to raise_exception(NameError)
       end
     end
 
@@ -103,7 +85,7 @@ module GitlabWebHook
 
     context 'with delete branch commit' do
       it 'expects to implemented in concrete implementation' do
-        expect { subject.repository_url }.to raise_exception(NameError)
+        expect { subject.repository_delete_branch_commit? }.to raise_exception(NameError)
       end
     end
 
