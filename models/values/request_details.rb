@@ -3,7 +3,7 @@ require_relative '../services/flat_keys_hash'
 module GitlabWebHook
   class RequestDetails
     def valid?
-      ['webhook', 'parameters'].include? kind
+      classic?
     end
 
     def repository_uri
@@ -68,6 +68,10 @@ module GitlabWebHook
           :branch
         ].each { |detail| flattened[detail.to_s] = self.send(detail) }
       end
+    end
+
+    def classic?
+      ['webhook', 'parameters'].include?(kind) && !repository_url.to_s.strip.empty?
     end
 
     private

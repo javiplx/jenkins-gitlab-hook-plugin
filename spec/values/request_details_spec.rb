@@ -3,6 +3,10 @@ require 'spec_helper'
 module GitlabWebHook
   describe RequestDetails do
     context 'with validation' do
+      before :each do
+        allow(subject).to receive(:kind) { 'webhook' }
+      end
+
       it 'is valid when repository url is present' do
         allow(subject).to receive(:repository_url) { 'http://repo.url' }
         expect(subject.valid?).to be
@@ -13,18 +17,6 @@ module GitlabWebHook
           allow(subject).to receive(:repository_url) { repository_url }
           expect(subject.valid?).not_to be
         end
-      end
-    end
-
-    context '#extended?' do
-      it 'is false' do
-        expect(subject.extended?).to eq(false)
-      end
-    end
-
-    context '#kind' do
-      it 'is push webhook' do
-        expect(subject.kind).to raise_exception(NoMethodError)
       end
     end
 

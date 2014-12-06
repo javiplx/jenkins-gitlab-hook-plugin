@@ -11,9 +11,9 @@ module GitlabWebHook
       end
     end
 
-    context '#kind' do
-      it 'is push webhook' do
-        expect(subject.kind).to eq('push')
+    context '#classic?' do
+      it 'is true' do
+        expect(subject.classic?).to eq(true)
       end
     end
 
