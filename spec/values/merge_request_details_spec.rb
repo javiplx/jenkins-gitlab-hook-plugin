@@ -31,22 +31,26 @@ module GitlabWebHook
       end
     end
 
-    context '#repository_url' do
-      it 'returns ssh url for repository' do
+    context do
+      before :each do
+        expect(subject).to receive(:get_project_details).and_return( {
+             'name' => 'diaspora' ,
+             'web_url' => 'http://localhost/peronospora',
+             'ssh_url_to_repo' => 'git@localhost:peronospora.git' } )
+      end
+
+      it '#repository_url returns ssh url for repository' do
         expect(subject.repository_url).to eq('git@localhost:peronospora.git')
       end
-    end
 
-    context '#repository_name' do
-      it 'returns for repository' do
+      it '#repository_name returns repository name' do
         expect(subject.repository_name).to eq('diaspora')
       end
-    end
 
-    context '#repository_homepage' do
-      it 'returns for repository' do
+      it '#repository_homepage returns homepage for repository' do
         expect(subject.repository_homepage).to eq('http://localhost/peronospora')
       end
+
     end
 
     context '#full_branch_reference' do
