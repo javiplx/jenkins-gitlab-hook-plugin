@@ -15,6 +15,30 @@ module GitlabWebHook
       @kind == 'merge_request'
     end
 
+    def project_id
+      payload['source_project_id'].to_s
+    end
+
+    def source_branch
+     payload['source_branch']
+    end
+
+    def target_project_id
+      payload['target_project_id'].to_s
+    end
+
+    def target_branch
+     payload['target_branch']
+    end
+
+    def state
+     payload['state']
+    end
+
+    def merge_status
+     payload['merge_status']
+    end
+
     private
 
     def throw_cross_repo_exception
