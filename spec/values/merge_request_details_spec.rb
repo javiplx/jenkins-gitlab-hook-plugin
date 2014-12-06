@@ -35,9 +35,33 @@ module GitlabWebHook
       end
     end
 
-    context '#url' do
+    context '#repository_url' do
       it 'returns ssh url for repository' do
-        expect(subject.project_id).to eq('git@example.com:diaspora.git')
+        expect(subject.project_id).to eq('git@localhost:peronospora.git')
+      end
+    end
+
+    context '#repository_name' do
+      it 'returns for repository' do
+        expect(subject.repository_name).to eq('diaspora')
+      end
+    end
+
+    context '#repository_homepage' do
+      it 'returns for repository' do
+        expect(subject.repository_homepage).to eq('http://localhost/peronospora')
+      end
+    end
+
+    context '#full_branch_reference' do
+      it 'returns for repository' do
+        expect(subject.full_branch_reference).to eq('ms-viewport')
+      end
+    end
+
+    context '#delete_branch_commit?' do
+      it 'returns for repository' do
+        expect(subject.delete_branch_commit?).to eq(false)
       end
     end
 
