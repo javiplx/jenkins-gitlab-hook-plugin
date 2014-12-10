@@ -30,6 +30,8 @@ module GitlabWebHook
       before(:each) do
         expect(cause_builder).to receive(:with).with(details)
         expect(actions_builder).to receive(:with).with(project, details)
+        expect(StreamTaskListener).to receive('new')
+        expect(project).to receive(:poll).and_return( double(has_changes?: true) )
       end
 
       context 'successfully' do
