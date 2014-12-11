@@ -23,6 +23,15 @@ module GitlabWebHook
       end
     end
 
+    context 'when there are no SCM changes' do
+      it 'skips the build' do
+        expect(StreamTaskListener).to receive('new')
+        expect(project).to receive(:poll).and_return( double(has_changes?: false) )
+        expect(project).not_to receive(:scheduleBuild2)
+        expect(subject.with(details, GetBuildActions.new, GetBuildCause.new)).to match('No SMC changes')
+      end
+    end
+
     context 'when build triggered' do
       let(:cause_builder) { double }
       let(:actions_builder) { double }
@@ -30,6 +39,8 @@ module GitlabWebHook
       before(:each) do
         expect(cause_builder).to receive(:with).with(details)
         expect(actions_builder).to receive(:with).with(project, details)
+        expect(StreamTaskListener).to receive('new')
+        expect(project).to receive(:poll).and_return( double(has_changes?: true) )
       end
 
       context 'successfully' do
