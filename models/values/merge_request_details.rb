@@ -73,9 +73,9 @@ module GitlabWebHook
       uri = URI "#{gitlab_url}/api/v3/projects/#{project_id}?private_token=#{token}"
 
       req = Net::HTTP::Get.new uri.request_uri
+      req.verify_mode = OpenSSL::SSL::VERIFY_NONE
 
       res = Net::HTTP.start(uri.host, uri.port, :use_ssl => uri.scheme == 'https') do |http|
-        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
         http.request req
       end
 
