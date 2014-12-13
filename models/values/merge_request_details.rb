@@ -48,7 +48,7 @@ module GitlabWebHook
     end
 
     def repository_url
-      payload["source"] ? git_url(payload["source"]["ssh_url"]) : extended["ssh_url_to_repo"]
+      payload["source"] ? payload["source"]["ssh_url"] : extended["ssh_url_to_repo"]
     end
 
     def repository_name
@@ -80,10 +80,6 @@ module GitlabWebHook
       end
 
       JSON.parse( res.body )
-    end
-
-    def git_url ssh_url
-      ssh_url.split('/',4).slice(2,2).join(':')
     end
 
     def throw_cross_repo_exception

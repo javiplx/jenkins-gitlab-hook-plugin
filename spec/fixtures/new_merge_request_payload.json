@@ -25,14 +25,14 @@
     "description": "",
     "source": {
       "name": "awesome_project",
-      "ssh_url": "ssh://git@example.com/awesome_space/awesome_project.git",
+      "ssh_url": "git@example.com:awesome_space/awesome_project.git",
       "http_url": "http://example.com/awesome_space/awesome_project.git",
       "visibility_level": 20,
       "namespace": "awesome_space"
     },
     "target": {
       "name": "awesome_project",
-      "ssh_url": "ssh://git@example.com/awesome_space/awesome_project.git",
+      "ssh_url": "git@example.com:awesome_space/awesome_project.git",
       "http_url": "http://example.com/awesome_space/awesome_project.git",
       "visibility_level": 20,
       "namespace": "awesome_space"
