@@ -49,6 +49,19 @@ module GitlabWebHook
       Project.new(branch_project)
     end
 
+    def for_merge(details)
+      get_candidate_projects(details).each do |copy_from|
+        new_project_name = "#{copy_from.name}-mr-#{details.safe_branch}"
+        cloned_scm = prepare_scm_from(copy_from.scm, details)
+        new_project = Java.jenkins.model.Jenkins.instance.copy(copy_from.jenkins_project, new_project_name)
+        new_project.scm = cloned_scm
+        new_project.makeDisabled(false)
+        new_project.description = @settings.description
+        new_project.save
+        Project.new(new_project)
+      end
+    end
+
     private
 
     def get_project_to_copy_from(details)
@@ -60,6 +73,13 @@ module GitlabWebHook
       candidates = @get_jenkins_projects.named(template)
       raise NotFoundException.new("could not found template '#{template}'") if candidates.empty?
       candidates.first
+    end
+
+    def get_candidate_projects(details)
+      candidates = @get_jenkins_projects.matching_uri(details).select do |project|
+        !project.name.match("-mr-") && project.matches?(details, details.target_branch, true)
+      end
+      raise NotFoundException.new("could not find candidate for #{details.repository_name}::#{details.branch}") if candidates.empty?
     end
 
     def get_new_project_name(copy_from, details)
