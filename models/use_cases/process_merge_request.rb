@@ -12,12 +12,13 @@ module GitlabWebHook
       if details.merge_status != 'mergeable'
         messages << "Skipping not ready merge request for #{details.repository_name} with #{details.merge_status} status"
       else
+        project_name = "#{details.repository_name}-mr-#{details.safe_branch}"
         case details.state
         when 'opened', 'reopened'
-          messages << "Received merge request for #{details.repository_name}"
+          messages << "Create project for #{details.safe_branch} from #{details.repository_name}"
           projects = get_projects_to_process(details)
         when 'closed'
-          messages << "Skipping merge request close message"
+          messages << "Deleting project #{project_name}"
         else
           messages << "Skipping request : merge request status is '#{details.state}'"
         end
