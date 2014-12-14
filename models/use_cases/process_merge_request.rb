@@ -15,10 +15,22 @@ module GitlabWebHook
         project_name = "#{details.repository_name}-mr-#{details.safe_branch}"
         case details.state
         when 'opened', 'reopened'
-          messages << "Create project for #{details.safe_branch} from #{details.repository_name}"
-          projects = get_projects_to_process(details)
+          if @get_jenkins_projects.named(project_name).any?
+            messages << "Already created project for #{details.safe_branch} on #{details.repository_name}"
+          else
+            projects = get_project_candidates(details)
+            if projects.any?
+              messages << "Create project for #{details.safe_branch} from #{details.repository_name}"
+            else
+              messages << "No project candidate for merging #{details.safe_branch}"
+            end
+          end
         when 'closed'
-          messages << "Deleting project #{project_name}"
+          if @get_jenkins_projects.named(project_name).any?
+            messages << "Deleting project #{project_name}"
+          else
+            messages << "No project exists for #{project_name}"
+          end
         else
           messages << "Skipping request : merge request status is '#{details.state}'"
         end
@@ -28,7 +40,7 @@ module GitlabWebHook
 
     private
 
-    def get_projects_to_process(details)
+    def get_project_candidates(details)
       projects = @get_jenkins_projects.matching_uri(details)
     end
 
