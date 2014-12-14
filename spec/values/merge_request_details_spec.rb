@@ -10,6 +10,10 @@ module GitlabWebHook
       it 'requires payload data' do
         expect { MergeRequestDetails.new(nil) }.to raise_exception(ArgumentError)
       end
+      it 'raise exception for cross-repo merge requests' do
+        payload['object_attributes']['target_project_id'] = '15'
+        expect { MergeRequestDetails.new(payload) }.to raise_exception(BadRequestException)
+      end
     end
 
     it '#classic? is true' do

@@ -8,13 +8,6 @@ module GitlabWebHook
     let (:payload) { JSON.parse(File.read('spec/fixtures/new_merge_request_payload.json')) }
     let (:details) { MergeRequestDetails.new(payload) }
 
-    context 'with cross-repo merge request' do
-      let(:details) { double(MergeRequestDetails, source_project_id: '14', target_project_id: '15') }
-      it 'raise exception' do
-        expect { subject.with(details) }.to raise_exception(BadRequestException)
-      end
-    end
-
     context 'when merge request is unchecked' do
       it 'skips processing' do
         messages = subject.with(details)
