@@ -8,9 +8,11 @@ module GitlabWebHook
     let (:payload) { JSON.parse(File.read('spec/fixtures/new_merge_request_payload.json')) }
     let (:details) { MergeRequestDetails.new(payload) }
     let (:get_jenkins_projects) { double(named: []) }
+    let (:create_project_for_branch) { double(for_merge: []) }
 
     before :each do
       expect(GetJenkinsProjects).to receive(:new).and_return( get_jenkins_projects )
+      expect(CreateProjectForBranch).to receive(:new).and_return( create_project_for_branch )
     end
 
     context 'when merge request is unchecked' do
@@ -29,7 +31,7 @@ module GitlabWebHook
       context 'and status is opened' do
         it 'and project already exists' do
           expect(get_jenkins_projects).to receive(:named).and_return([double()])
-          expect(subject).not_to receive(:get_project_candidates)
+          expect(create_project_for_branch).not_to receive(:for_merge)
           messages = subject.with(details)
           expect(messages[0]).to match('Already created project for')
         end
@@ -39,7 +41,7 @@ module GitlabWebHook
             expect(messages[0]).to match('No project candidate for')
           end
           it 'and target branch candidate exists' do
-            expect(subject).to receive(:get_project_candidates).and_return([double()])
+            expect(create_project_for_branch).to receive(:for_merge).and_return([double()])
             messages = subject.with(details)
             expect(messages[0]).to match('Create project for')
           end
@@ -49,7 +51,7 @@ module GitlabWebHook
       context 'and status is closed' do
         before :each do
           expect(details).to receive(:state).and_return( 'closed' )
-          expect(subject).not_to receive(:get_project_candidates)
+          expect(create_project_for_branch).not_to receive(:for_merge)
         end
         it 'and project already exists' do
           expect(get_jenkins_projects).to receive(:named).and_return([double()])
@@ -68,7 +70,7 @@ module GitlabWebHook
         end
         it 'and project already exists' do
           expect(get_jenkins_projects).to receive(:named).and_return([double()])
-          expect(subject).not_to receive(:get_project_candidates)
+          expect(create_project_for_branch).not_to receive(:for_merge)
           messages = subject.with(details)
           expect(messages[0]).to match('Already created project for')
         end
@@ -78,7 +80,7 @@ module GitlabWebHook
             expect(messages[0]).to match('No project candidate for')
           end
           it 'and target branch candidate exists' do
-            expect(subject).to receive(:get_project_candidates).and_return([double()])
+            expect(create_project_for_branch).to receive(:for_merge).and_return([double()])
             messages = subject.with(details)
             expect(messages[0]).to match('Create project for')
           end

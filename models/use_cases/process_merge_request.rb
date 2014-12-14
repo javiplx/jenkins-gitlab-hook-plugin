@@ -1,10 +1,12 @@
 require_relative '../services/get_jenkins_projects'
+require_relative 'create_project_for_branch.rb'
 
 module GitlabWebHook
   class ProcessMergeRequest
 
-    def initialize(get_jenkins_projects = GetJenkinsProjects.new)
+    def initialize(get_jenkins_projects = GetJenkinsProjects.new, create_project_for_branch = CreateProjectForBranch.new)
       @get_jenkins_projects = get_jenkins_projects
+      @create_project_for_branch = create_project_for_branch
     end
 
     def with(details)
@@ -18,7 +20,7 @@ module GitlabWebHook
           if @get_jenkins_projects.named(project_name).any?
             messages << "Already created project for #{details.safe_branch} on #{details.repository_name}"
           else
-            projects = get_project_candidates(details)
+            projects = @create_project_for_branch.for_merge(details)
             if projects.any?
               messages << "Create project for #{details.safe_branch} from #{details.repository_name}"
             else
@@ -36,12 +38,6 @@ module GitlabWebHook
         end
       end
       messages
-    end
-
-    private
-
-    def get_project_candidates(details)
-      projects = @get_jenkins_projects.matching_uri(details)
     end
 
   end
