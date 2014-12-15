@@ -41,9 +41,9 @@ module GitlabWebHook
             expect(messages[0]).to match('No project candidate for')
           end
           it 'and target branch candidate exists' do
-            expect(create_project_for_branch).to receive(:for_merge).and_return([double()])
+            expect(create_project_for_branch).to receive(:for_merge).and_return([double(ignore_notify_commit?: true, to_s: 'project')])
             messages = subject.with(details)
-            expect(messages[0]).to match('Create project for')
+            expect(messages[0]).to match('Created project for')
           end
         end
       end
@@ -80,9 +80,9 @@ module GitlabWebHook
             expect(messages[0]).to match('No project candidate for')
           end
           it 'and target branch candidate exists' do
-            expect(create_project_for_branch).to receive(:for_merge).and_return([double()])
+            expect(create_project_for_branch).to receive(:for_merge).and_return([double(ignore_notify_commit?: true, to_s: 'project')])
             messages = subject.with(details)
-            expect(messages[0]).to match('Create project for')
+            expect(messages[0]).to match('Created project for')
           end
         end
       end
