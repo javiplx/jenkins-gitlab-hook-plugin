@@ -4,10 +4,6 @@ require_relative '../services/flat_keys_hash'
 module GitlabWebHook
   class RequestDetails < AbstractDetails
 
-    def repository_uri
-      RepositoryUri.new(repository_url)
-    end
-
     def full_branch_reference
       raise NameError.new("should be implemented in concrete implementation")
     end
