@@ -27,6 +27,10 @@ module GitlabWebHook
       payload['source_branch']
     end
 
+    def full_branch_reference
+      "refs/heads/#{branch}"
+    end
+
     def target_project_id
       return "" unless payload['target_project_id']
       payload['target_project_id'].to_s
