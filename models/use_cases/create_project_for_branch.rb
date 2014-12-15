@@ -76,10 +76,10 @@ module GitlabWebHook
     end
 
     def get_candidate_projects(details)
-      candidates = @get_jenkins_projects.matching_uri(details).select do |project|
+      not_found_message = "could not find candidate for #{details.repository_name}::#{details.branch}"
+      @get_jenkins_projects.matching_uri(details).select do |project|
         !project.name.match("-mr-") && project.matches?(details, details.target_branch, true)
-      end
-      raise NotFoundException.new("could not find candidate for #{details.repository_name}::#{details.branch}") if candidates.empty?
+      end || raise(NotFoundException.new(not_found_message))
     end
 
     def get_new_project_name(copy_from, details)
