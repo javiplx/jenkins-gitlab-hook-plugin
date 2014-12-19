@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module GitlabWebHook
   describe BuildNow do
-    let(:details) { double(RequestDetails, payload: double) }
+    let(:details) { double(RequestDetails, payload: double, before: 'non-empty-sha1') }
     let(:project) { double(Project, ignore_notify_commit?: false, buildable?: true, getQuietPeriod: double) }
     let(:logger) { double }
     let(:subject) { BuildNow.new(project, logger) }

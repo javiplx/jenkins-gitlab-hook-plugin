@@ -26,8 +26,10 @@ module GitlabWebHook
       raise ArgumentError.new('details are required') unless details
 
       begin
-        poll_result = project.poll StreamTaskListener.new()
-        return "No SMC changes on #{project}" unless poll_result.has_changes?
+        unless details.before == "0000000000000000000000000000000000000000"
+          poll_result = project.poll StreamTaskListener.new()
+          return "No SMC changes on #{project}" unless poll_result.has_changes?
+        end
         return "#{project} scheduled for build" if project.scheduleBuild2(project.getQuietPeriod(), cause_builder.with(details), actions_builder.with(project, details))
       rescue java.lang.Exception => e
         # avoid method signature warnings
