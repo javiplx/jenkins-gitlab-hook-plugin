@@ -57,34 +57,17 @@ module GitlabWebHook
         expect { subject.with(details) }.to raise_exception(ConfigurationException)
       end
 
-      context 'returns a new project' do
+      it 'returns a new project' do
 
-        let(:plugin_manager) { double() }
-        let(:gitplugin) { double() }
+        expect(jenkins_instance).to receive(:copy).with(jenkins_project, anything).and_return(new_jenkins_project)
+        expect(UserRemoteConfig).to receive('new').and_return(remote_config)
+        expect(remote_config).to receive('java_object').and_return(double)
+        expect(GitSCM).to receive('new')
 
-        before(:each) do
-          expect(jenkins_instance).to receive(:copy).with(jenkins_project, anything).and_return(new_jenkins_project)
-          expect(jenkins_instance).to receive(:getPluginManager).and_return(plugin_manager)
-          expect(plugin_manager).to receive(:getPlugin).with('git').and_return(gitplugin)
-          expect(UserRemoteConfig).to receive('new').and_return(remote_config)
-          expect(remote_config).to receive('java_object').and_return(double)
-          expect(GitSCM).to receive('new')
-        end
-
-        it 'with git plugin < 2.0' do
-          expect(gitplugin).to receive(:isOlderThan) { true }
-          branch_project = subject.with(details)
-          expect(branch_project).to be_kind_of(Project)
-          expect(branch_project.jenkins_project).to eq(new_jenkins_project)
-        end
-
-        it 'with git plugin >= 2.0' do
-          expect(gitplugin).to receive(:isOlderThan) { false }
-          allow(remote_config).to receive(:getCredentialsId) { 'sha_id' }
-          branch_project = subject.with(details)
-          expect(branch_project).to be_kind_of(Project)
-          expect(branch_project.jenkins_project).to eq(new_jenkins_project)
-        end
+        allow(remote_config).to receive(:getCredentialsId) { 'sha_id' }
+        branch_project = subject.with(details)
+        expect(branch_project).to be_kind_of(Project)
+        expect(branch_project.jenkins_project).to eq(new_jenkins_project)
 
       end
     end
