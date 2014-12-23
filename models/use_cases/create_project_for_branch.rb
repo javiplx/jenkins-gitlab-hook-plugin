@@ -8,9 +8,6 @@ include Java
 java_import Java.hudson.plugins.git.GitSCM
 java_import Java.hudson.plugins.git.BranchSpec
 java_import Java.hudson.plugins.git.UserRemoteConfig
-java_import Java.hudson.plugins.git.browser.GitLab
-java_import Java.hudson.plugins.git.util.DefaultBuildChooser
-java_import Java.hudson.util.VersionNumber
 
 
 module GitlabWebHook
@@ -88,51 +85,16 @@ module GitlabWebHook
       remote_refspec = scm_config.getRefspec()
       raise ConfigurationException.new('remote repo clone url not found') unless remote_url
 
-      legacy = VersionNumber.new( "1.9.9" )
-      gitplugin = Java.jenkins.model.Jenkins.instance.getPluginManager().getPlugin('git')
-
-      if gitplugin.isOlderThan( legacy )
-        GitSCM.new(
-          scm_name,
-          java.util.ArrayList.new([UserRemoteConfig.new(remote_url, remote_name, remote_refspec).java_object]),
-          branchlist,
-          source_scm.getUserMergeOptions(),
-          source_scm.getDoGenerate(),
-          source_scm.getSubmoduleCfg(),
-          source_scm.getClean(),
-          source_scm.getWipeOutWorkspace(),
-          DefaultBuildChooser.new,
-          GitLab.new(details.repository_homepage),
-          source_scm.getGitTool,
-          source_scm.getAuthorOrCommitter(),
-          source_scm.getRelativeTargetDir(),
-          source_scm.getReference(),
-          source_scm.getExcludedRegions(),
-          source_scm.getExcludedUsers(),
-          source_scm.getLocalBranch(),
-          source_scm.getDisableSubmodules(),
-          source_scm.getRecursiveSubmodules(),
-          source_scm.getPruneBranches(),
-          source_scm.getRemotePoll(),
-          source_scm.getGitConfigName(),
-          source_scm.getGitConfigEmail(),
-          source_scm.getSkipTag(),
-          source_scm.getIncludedRegions(),
-          source_scm.isIgnoreNotifyCommit(),
-          source_scm.getUseShallowClone()
-        )
-      else
-        remote_credentials = source_scm.getUserRemoteConfigs().first.getCredentialsId()
-        GitSCM.new(
-          java.util.ArrayList.new([UserRemoteConfig.new(remote_url, remote_name, remote_refspec, remote_credentials).java_object]),
-          branchlist,
-          source_scm.isDoGenerateSubmoduleConfigurations(),
-          source_scm.getSubmoduleCfg(),
-          source_scm.getBrowser(),
-          source_scm.getGitTool(),
-          source_scm.getExtensions()
-        )
-      end
+      remote_credentials = source_scm.getUserRemoteConfigs().first.getCredentialsId()
+      GitSCM.new(
+        java.util.ArrayList.new([UserRemoteConfig.new(remote_url, remote_name, remote_refspec, remote_credentials).java_object]),
+        branchlist,
+        source_scm.isDoGenerateSubmoduleConfigurations(),
+        source_scm.getSubmoduleCfg(),
+        source_scm.getBrowser(),
+        source_scm.getGitTool(),
+        source_scm.getExtensions()
+      )
     end
   end
 end
