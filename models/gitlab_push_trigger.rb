@@ -1,3 +1,5 @@
+require 'jenkins/triggers'
+
 java_import Java.java.util.logging.Logger
 
 # Triggers a Build.
