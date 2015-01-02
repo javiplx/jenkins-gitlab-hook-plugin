@@ -13,6 +13,7 @@ import hudson.triggers.TriggerDescriptor;
 
 import jenkins.model.Jenkins;
 
+import java.io.File;
 import java.io.IOException;
 
 import java.util.logging.Level;
@@ -48,7 +49,7 @@ public class GitlabPushTrigger extends Trigger<AbstractProject<?,?>> {
         getDescriptor().queue.execute(new Runnable() {
             public void run() {
                 try {
-                    StreamTaskListener listener = new StreamTaskListener();
+                    StreamTaskListener listener = new StreamTaskListener(getLogFile());
                     boolean result = job.poll(listener).hasChanges();
                     listener.close();
                 } catch (IOException e) {
@@ -56,6 +57,10 @@ public class GitlabPushTrigger extends Trigger<AbstractProject<?,?>> {
                 }
             }
         });
+    }
+
+    public File getLogFile() {
+        return new File(job.getRootDir(),"gitlab-polling.log");
     }
 
     @Override
