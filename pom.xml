@@ -10,7 +10,7 @@
   <groupId>org.javiplx</groupId>
   <artifactId>gitlab-push-trigger</artifactId>
   <packaging>hpi</packaging>
-  <version>0.1.1-SNAPSHOT</version>
+  <version>0.2.0-SNAPSHOT</version>
   <name>GitLab Push Trigger</name>
 
   <developers>
