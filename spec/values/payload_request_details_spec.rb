@@ -55,6 +55,17 @@ module GitlabWebHook
       end
     end
 
+    context 'with sha1 for previous commit' do
+      it 'extracts from payload' do
+        expect(subject.before).to eq('95790bf891e76fee5e1747ab589903a6a1f80f22')
+      end
+
+      it 'returns empty when nod before sha1 is found' do
+        payload.delete('before')
+        expect(subject.before).to eq('')
+      end
+    end
+
     context 'with delete branch commit' do
       it 'defaults to false' do
         expect(subject.delete_branch_commit?).not_to be
