@@ -19,6 +19,9 @@ class GitlabPushTrigger < Jenkins::Triggers::Trigger
     @some_field = attrs['some_field']
   end
 
+  def start(project, new_instance)
+  end
+
   # Executes the triggered task.
   #
   # This method is invoked when Trigger.new(String) is used
