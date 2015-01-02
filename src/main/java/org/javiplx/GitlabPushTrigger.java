@@ -46,12 +46,14 @@ public class GitlabPushTrigger extends Trigger<AbstractProject<?,?>> {
     }
 
     public void doPollAndRun(final String triggeredBy) {
+LOGGER.warning("doPollAndRun "+triggeredBy);
         getDescriptor().queue.execute(new Runnable() {
             public void run() {
                 try {
                     StreamTaskListener listener = new StreamTaskListener(getLogFile());
                     boolean result = job.poll(listener).hasChanges();
                     listener.close();
+LOGGER.log(Level.SEVERE,"doPollAndRun did produce "+result);
                     if (result) {
                         SCMTriggerCause cause;
                         try {
@@ -71,9 +73,12 @@ public class GitlabPushTrigger extends Trigger<AbstractProject<?,?>> {
                     }
                 } catch (IOException e) {
                     LOGGER.log(Level.SEVERE,"Failed to record SCM polling",e);
+} catch (Exception e) {
+LOGGER.log(Level.SEVERE,"OTra excepcion rarita",e);
                 }
             }
         });
+LOGGER.log(Level.SEVERE,"doPollAndRun "+triggeredBy);
     }
 
     public File getLogFile() {
