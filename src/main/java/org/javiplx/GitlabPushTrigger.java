@@ -1,11 +1,15 @@
 package org.javiplx;
 
 import hudson.Extension;
+import hudson.Util;
+
+import hudson.console.AnnotatedLargeText;
 
 import hudson.util.SequentialExecutionQueue;
 import hudson.util.StreamTaskListener;
 
 import hudson.model.AbstractProject;
+import hudson.model.Action;
 import hudson.model.Item;
 
 import hudson.triggers.Trigger;
@@ -13,13 +17,19 @@ import hudson.triggers.TriggerDescriptor;
 
 import jenkins.model.Jenkins;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.io.File;
 import java.io.IOException;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import java.nio.charset.Charset;
+
 import org.kohsuke.stapler.DataBoundConstructor;
+
+import org.apache.commons.jelly.XMLOutput;
 
 /**
  * @author <a href="mailto:javiplx@gmail.com">Javier Palacios</a>
@@ -61,6 +71,46 @@ public class GitlabPushTrigger extends Trigger<AbstractProject<?,?>> {
 
     public File getLogFile() {
         return new File(job.getRootDir(),"gitlab-polling.log");
+    }
+
+    @Override
+    public Collection<? extends Action> getProjectActions() {
+        return Collections.singleton(new GitlabPollAction());
+    }
+
+    /**
+     * Action object for {@link Project}. Used to display the polling log.
+     */
+    public final class GitlabPollAction implements Action {
+
+       public String getIconFileName() {
+           return "clipboard.png";
+       }
+
+       public String getDisplayName() {
+           return "Gitlab Trigger Log";
+       }
+
+       public String getUrlName() {
+           return "GitlabPollLog";
+       }
+
+       public AbstractProject<?,?> getOwner() {
+           return job;
+       }
+
+       public String getLog() throws IOException {
+           return Util.loadFile(getLogFile());
+       }
+
+       /**
+        * Writes the annotated log to the given output.
+        * @since 1.350
+        */
+       public void writeLogTo(XMLOutput out) throws IOException {
+           new AnnotatedLargeText<GitlabPollAction>(getLogFile(), Charset.defaultCharset(),true,this).writeHtmlTo(0,out.asWriter());
+        }
+
     }
 
     @Override
