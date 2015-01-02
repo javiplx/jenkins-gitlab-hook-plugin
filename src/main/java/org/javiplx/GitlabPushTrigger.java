@@ -14,6 +14,7 @@ import hudson.model.Item;
 
 import hudson.triggers.Trigger;
 import hudson.triggers.TriggerDescriptor;
+import hudson.triggers.SCMTrigger.SCMTriggerCause;
 
 import jenkins.model.Jenkins;
 
@@ -44,24 +45,30 @@ public class GitlabPushTrigger extends Trigger<AbstractProject<?,?>> {
         super();
     }
 
-    /**
-     * Called when a POST is made.
-     */
-    @Deprecated
-    public void onPost() {
-        onPost("");
-    }
-
-    /**
-     * Called when a POST is made.
-     */
-    public void onPost(String triggeredByUser) {
+    public void doPollAndRun(final String triggeredBy) {
         getDescriptor().queue.execute(new Runnable() {
             public void run() {
                 try {
                     StreamTaskListener listener = new StreamTaskListener(getLogFile());
                     boolean result = job.poll(listener).hasChanges();
                     listener.close();
+                    if (result) {
+                        SCMTriggerCause cause;
+                        try {
+                            cause = new SCMTriggerCause(Util.loadFile(getLogFile()));
+                        } catch (IOException e) {
+                            LOGGER.log(Level.SEVERE,"Canot create cause from poll log",e);
+                            cause = new SCMTriggerCause(triggeredBy);
+                        }
+                        if (job.scheduleBuild(job.getQuietPeriod(), cause)) {
+                            String name = " #"+job.getNextBuildNumber();
+                            LOGGER.info("SCM changes detected in "+ job.getName()+". Triggering "+name);
+                        } else {
+                            LOGGER.info("SCM changes detected in "+ job.getName()+". Job is already in the queue");
+                        }
+                    } else {
+                        LOGGER.info("No SCM changes detected in "+ job.getName());
+                    }
                 } catch (IOException e) {
                     LOGGER.log(Level.SEVERE,"Failed to record SCM polling",e);
                 }
