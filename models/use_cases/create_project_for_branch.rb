@@ -10,6 +10,8 @@ java_import Java.hudson.plugins.git.BranchSpec
 java_import Java.hudson.plugins.git.UserRemoteConfig
 java_import Java.hudson.plugins.git.browser.GitLab
 java_import Java.hudson.plugins.git.util.DefaultBuildChooser
+java_import Java.hudson.plugins.git.UserMergeOptions
+java_import Java.hudson.plugins.git.extensions.impl.PreBuildMerge
 java_import Java.hudson.util.VersionNumber
 
 
@@ -53,6 +55,9 @@ module GitlabWebHook
       get_candidate_projects(details).each do |copy_from|
         new_project_name = "#{copy_from.name}-mr-#{details.safe_branch}"
         cloned_scm = prepare_scm_from(copy_from.scm, details)
+        # What about candidates with pre-build merge enabled?
+        user_merge_options = UserMergeOptions.new('origin', details.target_branch, 'default')
+        cloned_scm.extensions.add PreBuildMerge.new(user_merge_options)
         new_project = Java.jenkins.model.Jenkins.instance.copy(copy_from.jenkins_project, new_project_name)
         new_project.scm = cloned_scm
         new_project.makeDisabled(false)

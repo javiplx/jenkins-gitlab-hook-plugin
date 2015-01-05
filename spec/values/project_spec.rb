@@ -1,7 +1,5 @@
 require 'spec_helper'
 
-java_import Java.hudson.plugins.git.UserMergeOptions
-
 module GitlabWebHook
   describe Project do
     let(:jenkins_project) { double(AbstractProject, fullName: 'diaspora') }
