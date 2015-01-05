@@ -4,6 +4,10 @@ require_relative '../services/flat_keys_hash'
 module GitlabWebHook
   class RequestDetails < AbstractDetails
 
+    def valid?
+      repository_url.to_s.strip.empty? ? false : true
+    end
+
     def branch
       ref = full_branch_reference
       return "" unless ref

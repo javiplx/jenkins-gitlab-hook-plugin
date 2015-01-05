@@ -5,7 +5,7 @@ module GitlabWebHook
     attr_accessor :kind
 
     def valid?
-      classic?
+      raise NameError.new("should be implemented in concrete implementation")
     end
 
     def repository_uri
