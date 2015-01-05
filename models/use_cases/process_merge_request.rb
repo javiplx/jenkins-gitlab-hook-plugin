@@ -38,7 +38,7 @@ module GitlabWebHook
               messages << "No project candidate for merging #{details.safe_branch}"
             end
           end
-        when 'closed'
+        when 'closed', 'merged'
           candidates.each do |project|
             project.delete
             messages << "Deleting merge-request project #{project.name}"
