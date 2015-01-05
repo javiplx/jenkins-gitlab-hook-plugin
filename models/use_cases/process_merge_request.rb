@@ -14,9 +14,9 @@ module GitlabWebHook
       if details.merge_status != 'mergeable'
         messages << "Skipping not ready merge request for #{details.repository_name} with #{details.merge_status} status"
       else
-        project_name = "#{details.repository_name}-mr-#{details.safe_branch}"
         case details.state
         when 'opened', 'reopened'
+          project_name = "#{details.repository_name}-mr-#{details.safe_branch}"
           if @get_jenkins_projects.named(project_name).any?
             messages << "Already created project for #{details.safe_branch} on #{details.repository_name}"
           else
@@ -31,10 +31,13 @@ module GitlabWebHook
             end
           end
         when 'closed'
-          if @get_jenkins_projects.named(project_name).any?
-            messages << "Deleting project #{project_name}"
-          else
-            messages << "No project exists for #{project_name}"
+          candidates = @get_jenkins_projects.matching_uri(details)
+          candidates.select! do |project|
+            project.matches?(details, details.branch, true) && project.merge_to?(details.target_branch)
+          end
+          candidates.each do |project|
+            project.delete
+            messages << "Deleting merge-request project #{project.name}"
           end
         else
           messages << "Skipping request : merge request status is '#{details.state}'"
