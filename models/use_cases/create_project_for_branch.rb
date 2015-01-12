@@ -52,7 +52,7 @@ module GitlabWebHook
     end
 
     def for_merge(details)
-      get_candidate_projects(details).each do |copy_from|
+      get_candidate_projects(details).collect do |copy_from|
         new_project_name = "#{copy_from.name}-mr-#{details.safe_branch}"
         cloned_scm = prepare_scm_from(copy_from.scm, details)
         # What about candidates with pre-build merge enabled?

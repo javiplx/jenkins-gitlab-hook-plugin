@@ -31,7 +31,7 @@ module GitlabWebHook
             projects = @create_project_for_branch.for_merge(details)
             if projects.any?
               projects.each do |project|
-                messages << "Created #{project} for #{details.safe_branch} from #{details.repository_name}"
+                messages << "Created #{project.name} for #{details.branch} from #{details.repository_name}"
                 messages << BuildNow.new(project).with(details)
               end
             else
