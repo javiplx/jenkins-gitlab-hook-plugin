@@ -2,6 +2,7 @@ require_relative '../exceptions/not_found_exception'
 require_relative '../exceptions/configuration_exception'
 require_relative '../values/project'
 require_relative '../services/get_jenkins_projects'
+require_relative '../services/security'
 
 include Java
 
@@ -21,13 +22,16 @@ module GitlabWebHook
       copy_from = get_project_to_copy_from(details)
       new_project_name = get_new_project_name(copy_from, details)
       cloned_scm = prepare_scm_from(copy_from.scm, details)
+      branch_project = nil
 
-      # TODO: set github url, requires github plugin reference
-      branch_project = Java.jenkins.model.Jenkins.instance.copy(copy_from.jenkins_project, new_project_name)
-      branch_project.scm = cloned_scm
-      branch_project.makeDisabled(false)
-      branch_project.description = @settings.description
-      branch_project.save
+      Security.impersonate(ACL::SYSTEM) do
+          # TODO: set github url, requires github plugin reference
+          branch_project = Java.jenkins.model.Jenkins.instance.copy(copy_from.jenkins_project, new_project_name)
+          branch_project.scm = cloned_scm
+          branch_project.makeDisabled(false)
+          branch_project.description = @settings.description
+          branch_project.save
+      end
 
       Project.new(branch_project)
     end
@@ -38,11 +42,15 @@ module GitlabWebHook
       new_project_name = details.repository_name
       raise ConfigurationException.new("project #{new_project_name} already created from #{template}") unless @get_jenkins_projects.named(new_project_name).empty?
       modified_scm = prepare_scm_from(copy_from.scm, details, true)
+      branch_project = nil
 
-      branch_project = Java.jenkins.model.Jenkins.instance.copy(copy_from.jenkins_project, new_project_name)
-      branch_project.scm = modified_scm
-      branch_project.makeDisabled(false)
-      branch_project.save
+      Security.impersonate(ACL::SYSTEM) do
+        branch_project = Java.jenkins.model.Jenkins.instance.copy(copy_from.jenkins_project, new_project_name)
+        branch_project.scm = modified_scm
+        branch_project.makeDisabled(false)
+        branch_project.save
+      end
+
       Project.new(branch_project)
     end
 
