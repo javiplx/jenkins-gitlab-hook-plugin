@@ -11,7 +11,7 @@ module GitlabWebHook
 
     def with(details)
       messages = []
-      if details.merge_status != 'mergeable'
+      if details.merge_status == 'cannot_be_merged'
         messages << "Skipping not ready merge request for #{details.repository_name} with #{details.merge_status} status"
       else
         candidates = @get_jenkins_projects.matching_uri(details)

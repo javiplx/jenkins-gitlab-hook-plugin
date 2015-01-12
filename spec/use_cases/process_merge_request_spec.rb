@@ -16,17 +16,23 @@ module GitlabWebHook
       expect(CreateProjectForBranch).to receive(:new).and_return( create_project_for_branch )
     end
 
-    context 'when merge request is unchecked' do
-      it 'skips processing' do
-        messages = subject.with(details)
-        expect(messages[0]).to match('Skipping not ready merge request')
+    context 'when merge request is unmergeable' do
+
+      [ 'opened', 'reopened' ].each do |state|
+        it "skips processing for state #{state}" do
+          expect(details).to receive(:merge_status).twice.and_return( 'cannot_be_merged' )
+          expect(details).to receive(:state).and_return( state )
+          messages = subject.with(details)
+          expect(messages[0]).to match('Skipping not ready merge request')
+        end
       end
+
     end
 
     context 'when merge request is mergeable' do
 
      before :each do
-       expect(details).to receive(:merge_status).and_return( 'mergeable' )
+       expect(details).to receive(:merge_status).and_return( 'can_be_merged' )
        expect(get_jenkins_projects).to receive(:matching_uri).and_return([jenkins_project])
      end
 
