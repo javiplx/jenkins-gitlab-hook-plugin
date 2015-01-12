@@ -42,11 +42,15 @@ module GitlabWebHook
       new_project_name = details.repository_name
       raise ConfigurationException.new("project #{new_project_name} already created from #{template}") unless @get_jenkins_projects.named(new_project_name).empty?
       modified_scm = prepare_scm_from(copy_from.scm, details, true)
+      branch_project = nil
 
-      branch_project = Java.jenkins.model.Jenkins.instance.copy(copy_from.jenkins_project, new_project_name)
-      branch_project.scm = modified_scm
-      branch_project.makeDisabled(false)
-      branch_project.save
+      Security.impersonate(ACL::SYSTEM) do
+        branch_project = Java.jenkins.model.Jenkins.instance.copy(copy_from.jenkins_project, new_project_name)
+        branch_project.scm = modified_scm
+        branch_project.makeDisabled(false)
+        branch_project.save
+      end
+
       Project.new(branch_project)
     end
 
