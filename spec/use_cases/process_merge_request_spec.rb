@@ -27,6 +27,16 @@ module GitlabWebHook
         end
       end
 
+      it "keeps processing when closing" do
+        expect(details).to receive(:merge_status).and_return( 'cannot_be_merged' )
+        expect(details).to receive(:state).twice.and_return( 'closed' )
+        expect(get_jenkins_projects).to receive(:matching_uri).and_return([jenkins_project])
+        expect(jenkins_project).to receive(:matches?).and_return(true)
+        expect(jenkins_project).to receive(:merge_to?).and_return(true)
+        expect(jenkins_project).to receive(:delete)
+        subject.with(details)
+      end
+
     end
 
     context 'when merge request is mergeable' do
