@@ -26,6 +26,7 @@ module GitlabWebHook
           if candidates.any?
             candidates.each do |project|
              messages << "Already created #{project.name} for #{details.branch} -> #{details.target_branch}"
+             messages << BuildNow.new(project).with(details)
            end
           else
             projects = @create_project_for_branch.for_merge(details)

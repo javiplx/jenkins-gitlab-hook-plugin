@@ -38,6 +38,7 @@ module GitlabWebHook
         it 'and project already exists' do
           expect(jenkins_project).to receive(:matches?).and_return(true)
           expect(jenkins_project).to receive(:merge_to?).and_return(true)
+          expect(BuildNow).to receive(:new).and_return(double(with:''))
           expect(create_project_for_branch).not_to receive(:for_merge)
           subject.with(details)
         end
