@@ -76,6 +76,16 @@ module GitlabWebHook
       end
     end
 
+    # Maybe all this stuff could get delegated to an SCM poll, but on the meantime
+    # we need to clarify the behaviour. From the available BranchSpec tests on the
+    # git plugin, we seen that when there is no slash on the branch specification,
+    # the first token of the supplied string is discarded, thus producing a false
+    # match when the string neither has a slash and is equal to the branchspec. And
+    # when there is a slash on configured BranchSpec, an standard matching is done,
+    # with no extra work on the supplied string.
+    # This means that the git plugin expects the supplied branch to be always prefixed
+    # with the remote name.
+    #
     def matches_branch?(details, branch = false, exactly = false)
       ref = details.full_branch_reference
       branch = details.branch unless branch
