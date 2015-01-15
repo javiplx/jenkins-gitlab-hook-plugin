@@ -101,12 +101,18 @@ module GitlabWebHook
           refspecs = repo.getFetchRefSpecs().select{ |refspec| refspec.matchSource(ref) }.tap do |refspec|
             matched_refs << refspec
           end
+          # When BranchSpec seems to be a 'refs' style, we use the reference supplied by
+          # gitlab, which is the reference on its local repository. In any other case, we
+          # follow the classic gitlab-hook processing.
           if scm_branch.name.start_with?('refs/')
             token = ref
-	  else
-            token = ( scm_branch.name.match('/') ? "#{repo.name}/" : "" ) + branch
+          else
+            token = "#{repo.name}/#{branch}"
           end
-          refspecs.any? && ( exactly ? scm_branch.name == token : scm_branch.matches(token) )
+          # if scm_branch.name has no slash, repo.name will be filtered on 'matches' call,
+          # but some extra handling is required to succeed when exactly is true.
+          scm_branch_name = scm_branch.name.match('/') ? scm_branch.name : "#{repo.name}/#{scm_branch.name}"
+          refspecs.any? && ( exactly ? scm_branch_name == token : scm_branch.matches(token) )
         end
       end
 
