@@ -19,9 +19,21 @@ describe "BranchSpect matching" do
       it "when string is '*/master'" do
         expect(subject.matches('*/master')).to be(true)
       end
+      it "when string is 'remotes/master'" do
+        expect(subject.matches('remotes/master')).to be(true)
+      end
     end
 
     context "will not match" do
+      it "when string is 'refs/remotes/master'" do
+        expect(subject.matches('refs/remotes/master')).to be(false)
+      end
+      it "when string is 'refs/remotes/origin/master'" do
+        expect(subject.matches('refs/remotes/origin/master')).to be(false)
+      end
+      it "when string is 'remotes/origin/master'" do
+        expect(subject.matches('remotes/origin/master')).to be(false)
+      end
       it "when string is 'origin/otherbranch'" do
         expect(subject.matches('origin/otherbranch')).to be(false)
       end
@@ -56,6 +68,18 @@ describe "BranchSpect matching" do
     context "will not match" do
       it "when string is 'master'" do
         expect(subject.matches('master')).to be(false)
+      end
+      it "when string is 'refs/remotes/master'" do
+        expect(subject.matches('refs/remotes/master')).to be(false)
+      end
+      it "when string is 'remotes/master'" do
+        expect(subject.matches('remotes/master')).to be(false)
+      end
+      it "when string is 'refs/remotes/origin/master'" do
+        expect(subject.matches('refs/remotes/origin/master')).to be(false)
+      end
+      it "when string is 'remotes/origin/master'" do
+        expect(subject.matches('remotes/origin/master')).to be(false)
       end
       it "when string is 'other/master'" do
         expect(subject.matches('other/master')).to be(false)

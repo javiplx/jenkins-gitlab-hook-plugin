@@ -85,6 +85,8 @@ module GitlabWebHook
     # with no extra work on the supplied string.
     # This means that the git plugin expects the supplied branch to be always prefixed
     # with the remote name.
+    # Adding 'remotes' or 'refs/remotes' to the string does not change the match
+    # behaviour except when by chance the mismatching portion is discarded by git plugin.
     #
     def matches_branch?(details, branch = false, exactly = false)
       ref = details.full_branch_reference
