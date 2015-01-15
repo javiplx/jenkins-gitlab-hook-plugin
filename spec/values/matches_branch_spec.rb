@@ -156,6 +156,55 @@ describe "BranchSpect matching" do
 
   end
 
+  # This is the default value suggested by git plugin
+  context "when branchspec is '*/master'" do
+    let(:subject) { BranchSpec.new('*/master') }
+
+    context "will match" do
+      it "when string is 'origin/master'" do
+        expect(subject.matches('origin/master')).to be(true)
+      end
+      it "when string is 'other/master'" do
+        expect(subject.matches('other/master')).to be(true)
+      end
+      # This is a bit surprising, as wildcard in string seems not to be processed
+      it "when string is '*/master'" do
+        expect(subject.matches('*/master')).to be(true)
+      end
+    end
+
+    context "will not match" do
+      it "when string is 'origin/*'" do
+        expect(subject.matches('origin/*')).to be(false)
+      end
+      it "when string is 'origin/otherbranch'" do
+        expect(subject.matches('origin/otherbranch')).to be(false)
+      end
+      it "when string is 'master'" do
+        expect(subject.matches('master')).to be(false)
+      end
+      it "when string is '*/otherbranch'" do
+        expect(subject.matches('*/otherbranch')).to be(false)
+      end
+      it "when string is '*'" do
+        expect(subject.matches('*')).to be(false)
+      end
+      it "when string is '**'" do
+        expect(subject.matches('**')).to be(false)
+      end
+      it "when string is '*/*'" do
+        expect(subject.matches('*/*')).to be(false)
+      end
+      it "when string is '**/*'" do
+        expect(subject.matches('**/*')).to be(false)
+      end
+      it "when string is '*/**'" do
+        expect(subject.matches('*/**')).to be(false)
+      end
+    end
+
+  end
+
   context "when branchspec is 'refs/heads/master'" do
     let(:subject) { BranchSpec.new('refs/heads/master') }
 
