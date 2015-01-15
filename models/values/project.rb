@@ -87,6 +87,10 @@ module GitlabWebHook
     # with the remote name.
     # Adding 'remotes' or 'refs/remotes' to the string does not change the match
     # behaviour except when by chance the mismatching portion is discarded by git plugin.
+    # The results obtained when using any kind of 'refs/' prefix on configured branchspec
+    # lead us to supose that a simple ant-alike path wildcard matching is done among
+    # the configured refspec and the supplied string, except for the removal of the first
+    # path portion when refspec has no slash.
     #
     def matches_branch?(details, branch = false, exactly = false)
       ref = details.full_branch_reference
