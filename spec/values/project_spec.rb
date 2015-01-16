@@ -184,5 +184,97 @@ module GitlabWebHook
       end
     end
 
+    context "#matches?(branch='master')" do
+      let(:payload) { JSON.parse(File.read('spec/fixtures/default_payload.json')) }
+      let(:details) { PayloadRequestDetails.new(payload) }
+      let(:scm) { GitSCM.new( 'git@example.com:diaspora/diaspora.git' ) }
+
+      before (:each) do
+        allow(scm).to receive(:branches) { [branch] }
+        allow(jenkins_project).to receive(:scm) { scm }
+        allow(subject).to receive(:buildable?) { true }
+        allow(subject).to receive(:parametrized?) { false }
+      end
+
+      context "branchspec is 'master'" do
+        let(:branch) { BranchSpec.new('master') }
+        it "matches" do
+          expect(logger).to receive(:info)
+          expect( subject.matches?(details) ).to be(branch)
+        end
+      end
+
+      context "branchspec is 'origin/master'" do
+        let(:branch) { BranchSpec.new('origin/master') }
+        it "matches" do
+          expect(logger).to receive(:info)
+          expect( subject.matches?(details) ).to be(branch)
+        end
+      end
+
+      context "branchspec is 'other/master'" do
+        let(:branch) { BranchSpec.new('other/master') }
+        it "don't match" do
+          expect(logger).to receive(:info)
+          expect( subject.matches?(details) ).not_to be
+        end
+      end
+
+      context "branchspec is 'origin/otherbranch'" do
+        let(:branch) { BranchSpec.new('origin/otherbranch') }
+        it "don't match" do
+          expect(logger).to receive(:info)
+          expect( subject.matches?(details) ).not_to be
+        end
+      end
+
+    end
+
+    context "#matches?(branch='master', exactly=true)" do
+      let(:payload) { JSON.parse(File.read('spec/fixtures/default_payload.json')) }
+      let(:details) { PayloadRequestDetails.new(payload) }
+      let(:scm) { GitSCM.new( 'git@example.com:diaspora/diaspora.git' ) }
+
+      before (:each) do
+        allow(scm).to receive(:branches) { [branch] }
+        allow(jenkins_project).to receive(:scm) { scm }
+        allow(subject).to receive(:buildable?) { true }
+        allow(subject).to receive(:parametrized?) { false }
+      end
+
+      context "branchspec is 'master'" do
+        let(:branch) { BranchSpec.new('master') }
+        it "matches" do
+          expect(logger).to receive(:info)
+          expect( subject.matches?(details, false, true) ).to be(branch)
+        end
+      end
+
+      context "branchspec is 'origin/master'" do
+        let(:branch) { BranchSpec.new('origin/master') }
+        it "matches" do
+          expect(logger).to receive(:info)
+          expect( subject.matches?(details, false, true) ).to be(branch)
+        end
+      end
+
+      context "when branchspec is 'other/master'" do
+        let(:branch) { BranchSpec.new('other/master') }
+        it "don't match" do
+          expect(logger).to receive(:info)
+          expect( subject.matches?(details, false, true) ).not_to be
+        end
+      end
+
+      context "when branchspec is 'origin/otherbranch'" do
+        let(:branch) { BranchSpec.new('origin/otherbranch') }
+        it "don't match" do
+          expect(logger).to receive(:info)
+          expect( subject.matches?(details, false, true) ).not_to be
+        end
+      end
+
+    end
+
   end
 end

@@ -91,6 +91,22 @@ module GitlabWebHook
       end
     end
 
+    # Maybe all this stuff could get delegated to an SCM poll, but on the meantime
+    # we need to clarify the behaviour. From the available BranchSpec tests on the
+    # git plugin, we seen that when there is no slash on the branch specification,
+    # the first token of the supplied string is discarded, thus producing a false
+    # match when the string neither has a slash and is equal to the branchspec. And
+    # when there is a slash on configured BranchSpec, an standard matching is done,
+    # with no extra work on the supplied string.
+    # This means that the git plugin expects the supplied branch to be always prefixed
+    # with the remote name.
+    # Adding 'remotes' or 'refs/remotes' to the string does not change the match
+    # behaviour except when by chance the mismatching portion is discarded by git plugin.
+    # The results obtained when using any kind of 'refs/' prefix on configured branchspec
+    # lead us to supose that a simple ant-alike path wildcard matching is done among
+    # the configured refspec and the supplied string, except for the removal of the first
+    # path portion when refspec has no slash.
+    #
     def matches_branch?(details, branch = false, exactly = false)
       ref = details.full_branch_reference
       branch = details.branch unless branch
@@ -100,12 +116,18 @@ module GitlabWebHook
           refspecs = repo.getFetchRefSpecs().select{ |refspec| refspec.matchSource(ref) }.tap do |refspec|
             matched_refs << refspec
           end
+          # When BranchSpec seems to be a 'refs' style, we use the reference supplied by
+          # gitlab, which is the reference on its local repository. In any other case, we
+          # follow the classic gitlab-hook processing.
           if scm_branch.name.start_with?('refs/')
             token = ref
-	  else
-            token = ( scm_branch.name.match('/') ? "#{repo.name}/" : "" ) + branch
+          else
+            token = "#{repo.name}/#{branch}"
           end
-          refspecs.any? && ( exactly ? scm_branch.name == token : scm_branch.matches(token) )
+          # if scm_branch.name has no slash, repo.name will be filtered on 'matches' call,
+          # but some extra handling is required to succeed when exactly is true.
+          scm_branch_name = scm_branch.name.match('/') ? scm_branch.name : "#{repo.name}/#{scm_branch.name}"
+          refspecs.any? && ( exactly ? scm_branch_name == token : scm_branch.matches(token) )
         end
       end
 
