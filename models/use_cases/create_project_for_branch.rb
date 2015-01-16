@@ -100,6 +100,9 @@ module GitlabWebHook
       remote_url, remote_name, remote_refspec = nil, nil, nil
       scm_config = source_scm.getUserRemoteConfigs().first
 
+      remote_name = scm_config.getName()
+      remote_refspec = scm_config.getRefspec()
+
       if is_template
         remote_url = details.repository_url
         branchlist = source_scm.getBranches()
@@ -109,8 +112,6 @@ module GitlabWebHook
         branchlist = java.util.ArrayList.new([BranchSpec.new(remote_branch).java_object])
       end
 
-      remote_name = scm_config.getName()
-      remote_refspec = scm_config.getRefspec()
       raise ConfigurationException.new('remote repo clone url not found') unless remote_url
 
       legacy = VersionNumber.new( "1.9.9" )
