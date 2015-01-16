@@ -9,6 +9,8 @@ include Java
 java_import Java.hudson.plugins.git.GitSCM
 java_import Java.hudson.plugins.git.BranchSpec
 java_import Java.hudson.plugins.git.UserRemoteConfig
+java_import Java.hudson.plugins.git.UserMergeOptions
+java_import Java.hudson.plugins.git.extensions.impl.PreBuildMerge
 
 
 module GitlabWebHook
@@ -54,6 +56,27 @@ module GitlabWebHook
       Project.new(branch_project)
     end
 
+    def for_merge(details)
+      get_candidate_projects(details).collect do |copy_from|
+        new_project_name = "#{copy_from.name}-mr-#{details.safe_branch}"
+        cloned_scm = prepare_scm_from(copy_from.scm, details)
+        # What about candidates with pre-build merge enabled?
+        user_merge_options = UserMergeOptions.new('origin', details.target_branch, 'default')
+        cloned_scm.extensions.add PreBuildMerge.new(user_merge_options)
+        new_project = nil
+
+        Security.impersonate(ACL::SYSTEM) do
+          new_project = Java.jenkins.model.Jenkins.instance.copy(copy_from.jenkins_project, new_project_name)
+          new_project.scm = cloned_scm
+          new_project.makeDisabled(false)
+          new_project.description = @settings.description
+          new_project.save
+        end
+
+        Project.new(new_project)
+      end
+    end
+
     private
 
     def get_project_to_copy_from(details)
@@ -65,6 +88,13 @@ module GitlabWebHook
       candidates = @get_jenkins_projects.named(template)
       raise NotFoundException.new("could not found template '#{template}'") if candidates.empty?
       candidates.first
+    end
+
+    def get_candidate_projects(details)
+      not_found_message = "could not find candidate for #{details.repository_name}::#{details.branch}"
+      @get_jenkins_projects.matching_uri(details).select do |project|
+        project.matches?(details, details.target_branch, true)
+      end || raise(NotFoundException.new(not_found_message))
     end
 
     def get_new_project_name(copy_from, details)
@@ -80,6 +110,9 @@ module GitlabWebHook
       remote_url, remote_name, remote_refspec = nil, nil, nil
       scm_config = source_scm.getUserRemoteConfigs().first
 
+      remote_name = scm_config.getName()
+      remote_refspec = scm_config.getRefspec()
+
       if is_template
         remote_url = details.repository_url
         branchlist = source_scm.getBranches()
@@ -89,8 +122,6 @@ module GitlabWebHook
         branchlist = java.util.ArrayList.new([BranchSpec.new(remote_branch).java_object])
       end
 
-      remote_name = scm_config.getName()
-      remote_refspec = scm_config.getRefspec()
       raise ConfigurationException.new('remote repo clone url not found') unless remote_url
 
       remote_credentials = source_scm.getUserRemoteConfigs().first.getCredentialsId()

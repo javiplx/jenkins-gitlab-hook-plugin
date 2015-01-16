@@ -157,5 +157,32 @@ module GitlabWebHook
         end
       end
     end
+
+    context 'when looking for "Merge before build" extension' do
+      context 'method pre_build_merge? returns' do
+        it 'false when extension not present' do
+          expect(subject).to receive(:pre_build_merge) { nil }
+          expect(subject.pre_build_merge?).to be(false)
+        end
+	it 'true when extension is present' do
+          expect(subject).to receive(:pre_build_merge) { double(PreBuildMerge) }
+          expect(subject.pre_build_merge?).to be(true)
+        end
+      end
+      context 'method merge_to? returns' do
+        let(:user_merge_options) { UserMergeOptions.new('origin', 'dest_branch', 'default') }
+        let(:pre_build_merge) { PreBuildMerge.new(user_merge_options) }
+        before (:each) do
+          expect(subject).to receive(:pre_build_merge).twice { pre_build_merge }
+        end
+        it 'false when branch do not match' do
+          expect(subject.merge_to?('other_branch')).to be(false)
+        end
+	it 'true when match matches' do
+          expect(subject.merge_to?('dest_branch')).to be(true)
+        end
+      end
+    end
+
   end
 end

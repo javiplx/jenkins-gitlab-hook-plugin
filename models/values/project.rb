@@ -8,6 +8,7 @@ java_import Java.hudson.model.ParametersDefinitionProperty
 java_import Java.hudson.model.StringParameterDefinition
 java_import Java.hudson.plugins.git.GitSCM
 java_import Java.hudson.plugins.git.util.InverseBuildChooser
+java_import Java.hudson.plugins.git.extensions.impl.PreBuildMerge
 
 java_import Java.java.util.logging.Logger
 
@@ -46,6 +47,16 @@ module GitlabWebHook
       end
     end
 
+    def pre_build_merge?
+      pre_build_merge ? true : false
+    end
+
+    def merge_to?(branch)
+      return false unless pre_build_merge?
+      merge_params = pre_build_merge.get_options
+      merge_params.merge_target == branch
+    end
+
     def ignore_notify_commit?
       scm.isIgnoreNotifyCommit()
     end
@@ -69,6 +80,10 @@ module GitlabWebHook
     end
 
     private
+
+    def pre_build_merge
+      scm.extensions.get PreBuildMerge.java_class
+    end
 
     def matches_repo_uri?(details_uri)
       scm.repositories.find do |repo|

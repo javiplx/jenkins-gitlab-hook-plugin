@@ -29,10 +29,21 @@ module GitlabWebHook
         allow(details).to receive(:full_branch_reference) { 'master' }
         allow(details).to receive(:commits_count) { 1 }
         allow(details).to receive(:commits) { [double(Commit, url: 'http://localhost/diaspora/peronospora/commits/123456', message: 'fix')] }
+        allow(details).to receive(:kind) { 'webhook' }
 
         cause = subject.with(details)
         expect(cause.note).not_to match('no payload available')
         expect(cause.note).to match('commits/123456')
+      end
+      it 'contains merge request payload details' do
+        allow(details).to receive(:payload) { true }
+        allow(details).to receive(:branch) { 'feature/new' }
+        allow(details).to receive(:target_branch) { 'master' }
+        allow(details).to receive(:kind) { 'merge_request' }
+
+        cause = subject.with(details)
+        expect(cause.note).not_to match('no payload available')
+        expect(cause.note).to match('triggered by merge request')
       end
     end
 
