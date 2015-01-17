@@ -2,7 +2,10 @@ require_relative '../services/get_jenkins_projects'
 
 module GitlabWebHook
   class NotifyCommit
-    LOGGER = Java.java.util.logging.Logger.getLogger(NotifyCommit.class.name)
+    java_import Java.java.util.logging.Logger
+    java_import Java.java.util.logging.Level
+
+    LOGGER = Logger.getLogger(NotifyCommit.class.name)
 
     attr_reader :project
 
@@ -20,8 +23,8 @@ module GitlabWebHook
         return "#{project} scheduled for polling" if project.schedulePolling
       rescue java.lang.Exception => e
         # avoid method signature warnings
-        severe = logger.java_method(:log, [Java.java.util.logging.Level, java.lang.String, java.lang.Throwable])
-        severe.call(Java.java.util.logging.Level::SEVERE, e.message, e)
+        severe = logger.java_method(:log, [Level, java.lang.String, java.lang.Throwable])
+        severe.call(Level::SEVERE, e.message, e)
       end
 
       "#{project} could not be scheduled for polling, it is disabled or has no SCM trigger"

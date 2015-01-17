@@ -8,7 +8,10 @@ java_import Java.hudson.util.StreamTaskListener
 
 module GitlabWebHook
   class BuildNow
-    LOGGER = Java.java.util.logging.Logger.getLogger(self.class.name)
+    java_import Java.java.util.logging.Logger
+    java_import Java.java.util.logging.Level
+
+    LOGGER = Logger.getLogger(self.class.name)
 
     attr_reader :project
 
@@ -31,8 +34,8 @@ module GitlabWebHook
         return "#{project} scheduled for build" if project.scheduleBuild2(project.getQuietPeriod(), cause_builder.with(details), actions_builder.with(project, details))
       rescue java.lang.Exception => e
         # avoid method signature warnings
-        severe = logger.java_method(:log, [Java.java.util.logging.Level, java.lang.String, java.lang.Throwable])
-        severe.call(Java.java.util.logging.Level::SEVERE, e.message, e)
+        severe = logger.java_method(:log, [Level, java.lang.String, java.lang.Throwable])
+        severe.call(Level::SEVERE, e.message, e)
       end
 
       "#{project} could not be scheduled for build"
