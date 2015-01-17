@@ -9,8 +9,6 @@ java_import Java.hudson.model.StringParameterDefinition
 java_import Java.hudson.plugins.git.GitSCM
 java_import Java.hudson.plugins.git.util.InverseBuildChooser
 
-java_import Java.java.util.logging.Logger
-
 module GitlabWebHook
   class Project
     extend Forwardable
@@ -24,7 +22,7 @@ module GitlabWebHook
 
     attr_reader :jenkins_project
 
-    LOGGER = Logger.getLogger(Project.class.name)
+    LOGGER = Java.java.util.logging.Logger.getLogger(Project.class.name)
 
     def initialize(jenkins_project, logger = nil)
       raise ArgumentError.new("jenkins project is required") unless jenkins_project
