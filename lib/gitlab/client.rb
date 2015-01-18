@@ -4,21 +4,22 @@ require 'json'
 module Gitlab
   class Client
 
-    def initialize(url, token)
+    attr_accessor :id
+
+    def initialize(url, token, repo_name=nil)
       @gitlab_url = url
       @token = token
-
+      @id = get_id(repo_name) if repo_name
     end
 
     def get_id(repo_name)
-      url = "projects/search/#{repo_name}"
-      res = do_request url
+      res = do_request "projects/search/#{repo_name}"
       raise StandardError.new("No valid match") unless res.length == 1
       res.first['id']
     end
 
     def set_status(commit, status, ci_url)
-      url = "projects/1/repository/commits/#{commit}/status"
+      url = "projects/#{id}/repository/commits/#{commit}/status"
       do_request url, :state => status, :target_url => ci_url
     end
 
