@@ -17,9 +17,9 @@ module Gitlab
       res.first['id']
     end
 
-    def set_status(commit, status, url)
+    def set_status(commit, status, ci_url)
       url = "projects/1/repository/commits/#{commit}/status"
-      do_post url, :state => status, :target_url => url
+      do_post url, :state => status, :target_url => ci_url
     end
 
     private
