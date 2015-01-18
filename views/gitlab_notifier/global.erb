@@ -1,0 +1,15 @@
+<%
+  f = taglib("/lib/form")
+
+  f.section(:title => "Gitlab Notifier Configuration") do
+
+    f.entry :title => 'Gitlab URL', :field => 'gitlab_url' do
+      f.textbox :default => "#{descriptor.gitlab_url}"
+    end
+
+    f.entry :title => 'Gitlab token', :field => 'token' do
+      f.textbox :default => "#{descriptor.token}"
+    end
+
+  end
+%>
