@@ -220,6 +220,14 @@ module GitlabWebHook
         end
       end
 
+      context "branchspec is '*/master'" do
+        let(:branch) { BranchSpec.new('*/master') }
+        it "match" do
+          expect(logger).to receive(:info)
+          expect( subject.matches?(details) ).to be(branch)
+        end
+      end
+
       context "branchspec is 'origin/otherbranch'" do
         let(:branch) { BranchSpec.new('origin/otherbranch') }
         it "don't match" do
@@ -263,6 +271,14 @@ module GitlabWebHook
         it "don't match" do
           expect(logger).to receive(:info)
           expect( subject.matches?(details, false, true) ).not_to be
+        end
+      end
+
+      context "branchspec is '*/master'" do
+        let(:branch) { BranchSpec.new('*/master') }
+        it "matches" do
+          expect(logger).to receive(:info)
+          expect( subject.matches?(details, false, true) ).to be(branch)
         end
       end
 

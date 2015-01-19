@@ -122,7 +122,11 @@ module GitlabWebHook
           if scm_branch.name.start_with?('refs/')
             token = ref
           else
-            token = "#{repo.name}/#{branch}"
+            if scm_branch.name.start_with?('*/')
+              token = "*/#{branch}"
+            else
+              token = "#{repo.name}/#{branch}"
+            end
           end
           # if scm_branch.name has no slash, repo.name will be filtered on 'matches' call,
           # but some extra handling is required to succeed when exactly is true.
