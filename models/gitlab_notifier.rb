@@ -1,9 +1,12 @@
+require 'gitlab'
+
 class GitlabNotifier < Jenkins::Tasks::Publisher
 
   display_name 'Gitlab Notifier'
 
   def initialize(attrs)
     puts "#{self.class}#initialize #{attrs}"
+    @descriptor = Java.jenkins.model.Jenkins.instance.descriptor GitlabNotifierDescriptor.java_class
   end
 
   def prebuild(build, listener)
@@ -77,5 +80,11 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
   end
 
   describe_as Java.hudson.tasks.Publisher, :with => GitlabNotifierDescriptor
+
+  private
+
+  def client
+    @client ||= Gitlab::Client.new @descriptor.gitlab_url, @descriptor.token
+  end
 
 end
