@@ -1,7 +1,5 @@
 require 'spec_helper'
 
-require 'models/root_action_descriptor'
-
 module GitlabWebHook
   describe GetJenkinsProjects do
     context 'when fetching projects by request details' do

@@ -1,7 +1,5 @@
 require 'spec_helper'
 
-require 'models/root_action_descriptor'
-
 module GitlabWebHook
   describe CreateProjectForBranch do
     let(:details) { double(RequestDetails, repository_name: 'discourse', safe_branch: 'features_meta', branch: 'features/meta', repository_homepage: 'http://gitlab.com/group/discourse') }

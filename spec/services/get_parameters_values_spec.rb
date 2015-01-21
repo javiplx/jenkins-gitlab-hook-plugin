@@ -1,8 +1,5 @@
 require 'spec_helper'
 
-include Java
-
-java_import Java.hudson.model.StringParameterDefinition
 java_import Java.hudson.model.BooleanParameterValue
 
 module GitlabWebHook

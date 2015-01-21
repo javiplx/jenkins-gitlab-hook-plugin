@@ -1,7 +1,5 @@
 require 'spec_helper'
 
-require 'models/root_action_descriptor'
-
 module GitlabWebHook
   describe ProcessMergeRequest do
 
