@@ -18,14 +18,14 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
   def prebuild(build, listener)
     puts "#{self.class}#prebuild( #{build} , #{listener} )"
     client.name = repo_name(build)
-    env_vars = build.native.environment listener
-    @commit = env_vars['GIT_COMMIT']
-    @url = env_vars['BUILD_URL']
+    env = build.native.environment listener
+    client.post_status( env['GIT_COMMIT'] , 'running' , env['BUILD_URL'] )
   end
 
   def perform(build, launcher, listener)
     puts "#{self.class}#perform( #{build} , #{launcher} , #{listener} )"
-    status = build.native.result
+    env = build.native.environment listener
+    client.post_status( env['GIT_COMMIT'] , build.native.result , env['BUILD_URL'] )
   end
 
   class GitlabNotifierDescriptor < Jenkins::Model::DefaultDescriptor

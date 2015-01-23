@@ -18,7 +18,7 @@ module Gitlab
       end
     end
 
-    def set_status(commit, status, ci_url)
+    def post_status(commit, status, ci_url)
       url = "projects/#{id}/repository/commits/#{commit}/status"
       do_request url, :state => status, :target_url => ci_url
     end
