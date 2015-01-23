@@ -6,7 +6,8 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
 
   def initialize(attrs)
     puts "#{self.class}#initialize #{attrs}"
-    @descriptor = Java.jenkins.model.Jenkins.instance.descriptor GitlabNotifierDescriptor.java_class
+    plugin = Java.jenkins.model.Jenkins.instance.getPlugin 'gitlab-hook'
+    @descriptor = plugin.native_ruby_plugin.descriptors[GitlabNotifier.class]
   end
 
   def prebuild(build, listener)
