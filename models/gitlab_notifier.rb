@@ -10,9 +10,12 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
 
   def initialize(attrs)
     puts "#{self.class}#initialize #{attrs}"
-    plugin = Java.jenkins.model.Jenkins.instance.getPlugin 'gitlab-hook'
-    @descriptor = plugin.native_ruby_plugin.descriptors[GitlabNotifier]
-    @client = Gitlab::Client.new @descriptor
+    create_client
+  end
+
+  def read_completed
+    puts "#{self.class}#read_completed ... #{@plugin} - #{@pluginid} - #{@object}"
+    create_client
   end
 
   def prebuild(build, listener)
@@ -89,6 +92,12 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
   describe_as Java.hudson.tasks.Publisher, :with => GitlabNotifierDescriptor
 
   private
+
+  def create_client
+    plugin = Java.jenkins.model.Jenkins.instance.getPlugin 'gitlab-hook'
+    @descriptor = plugin.native_ruby_plugin.descriptors[GitlabNotifier]
+    @client = Gitlab::Client.new @descriptor
+  end
 
   def repo_name(build)
     project_scm = build.native.project.scm
