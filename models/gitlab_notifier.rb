@@ -4,6 +4,8 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
 
   display_name 'Gitlab Notifier'
 
+  transient :descriptor
+
   def initialize(attrs)
     puts "#{self.class}#initialize #{attrs}"
     plugin = Java.jenkins.model.Jenkins.instance.getPlugin 'gitlab-hook'
