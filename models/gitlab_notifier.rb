@@ -4,16 +4,20 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
 
   display_name 'Gitlab Notifier'
 
-  transient :descriptor
+  transient :descriptor, :client
+
+  attr_reader :client
 
   def initialize(attrs)
     puts "#{self.class}#initialize #{attrs}"
     plugin = Java.jenkins.model.Jenkins.instance.getPlugin 'gitlab-hook'
-    @descriptor = plugin.native_ruby_plugin.descriptors[GitlabNotifier.class]
+    @descriptor = plugin.native_ruby_plugin.descriptors[GitlabNotifier]
+    @client = Gitlab::Client.new @descriptor
   end
 
   def prebuild(build, listener)
     puts "#{self.class}#prebuild( #{build} , #{listener} )"
+    client.name = repo_name(build)
     env_vars = build.native.environment listener
     @commit = env_vars['GIT_COMMIT']
     @url = env_vars['BUILD_URL']
@@ -86,8 +90,10 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
 
   private
 
-  def client
-    @client ||= Gitlab::Client.new @descriptor.gitlab_url, @descriptor.token
+  def repo_name(build)
+    project_scm = build.native.project.scm
+    repo_url = project_scm.repositories.first.getURIs.first.to_s
+    repo_url.split(':')[1].split('/')[1].split('.')[0]
   end
 
 end
