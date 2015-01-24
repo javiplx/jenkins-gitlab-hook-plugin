@@ -9,6 +9,8 @@ module Jenkins
       include Jenkins::Model::Describable
       describe_as Java.hudson.triggers.Trigger, :with => Jenkins::Triggers::TriggerDescriptor
 
+      attr_accessor :job
+
       # Executes the triggered task.
       #
       # This method is invoked when Trigger.new(String) is used
