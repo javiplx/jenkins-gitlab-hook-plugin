@@ -3,6 +3,8 @@ module Jenkins::Triggers
     include Jenkins::Model::DescribableProxy
     proxy_for Jenkins::Triggers::Trigger
 
+    field_reader :job
+
     def start(project, new_instance)
       java_start = java_class.java_instance_methods.find{ |method| method.name == 'start' }
       java_start.invoke(self, project, new_instance)
