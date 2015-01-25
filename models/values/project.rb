@@ -82,6 +82,14 @@ module GitlabWebHook
       getProperty(ParametersDefinitionProperty.java_class).getParameterDefinitions()
     end
 
+    def push_trigger
+      # jenkins_project.getTrigger(Java.hudson.triggers.Trigger) gives too many matches
+      match = jenkins_project.getTriggers.select do |desc,trigger|
+        trigger.is_a? Jenkins::Triggers::TriggerProxy
+      end
+      match.values.first unless match.empty?
+    end
+
     private
 
     def matching_scms(details_uri)
