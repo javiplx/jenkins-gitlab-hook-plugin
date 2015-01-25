@@ -8,11 +8,27 @@ class GitlabPushTrigger < Jenkins::Triggers::Trigger
     get_descriptor.queue.execute(PollRunner.new(self))
   end
 
+  def project_actions
+    [ GitlabPollAction.new ]
+  end
+
   def self.applicable?(type)
     type.is_a? Java::HudsonModel::Project
   end
 
   private
+
+  class GitlabPollAction
+    include Jenkins::Model::Action
+    display_name "Gitlab Trigger Log"
+    icon "clipboard.png"
+    url_path "GitlabPollLog"
+  end
+
+  class GitlabPollActionProxy
+    include Jenkins::Model::ActionProxy
+    proxy_for GitlabPollAction
+  end
 
   class PollRunner
     include java.lang.Runnable

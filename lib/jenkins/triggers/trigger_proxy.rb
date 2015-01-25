@@ -3,6 +3,10 @@ module Jenkins::Triggers
     include Jenkins::Model::DescribableProxy
     proxy_for Jenkins::Triggers::Trigger
 
+    def getProjectActions
+      @object.project_actions.collect{ |action| @plugin.export(action) }
+    end
+
     def start(project, new_instance)
       @object.job = project
       java_start = java_class.java_instance_methods.find{ |method| method.name == 'start' }
