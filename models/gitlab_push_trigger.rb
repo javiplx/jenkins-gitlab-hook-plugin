@@ -5,7 +5,7 @@ class GitlabPushTrigger < Jenkins::Triggers::Trigger
   display_name "Trigger when changes are pushed to GitLab"
 
   def do_poll_and_run(triggered_by)
-    get_descriptor.queue.execute(PollRunner.new)
+    get_descriptor.queue.execute(PollRunner.new(self))
   end
 
   def self.applicable?(type)
@@ -19,9 +19,15 @@ class GitlabPushTrigger < Jenkins::Triggers::Trigger
 
     java_import Java.hudson.util.StreamTaskListener
 
+    attr_reader :trigger
+
+    def initialize(trigger)
+      @trigger = trigger
+    end
+
     def run
       listener = Java.hudson.util.StreamTaskListener.new(Java.java.io.File.new("/tmp/poll.log"))
-      result = job.poll(listener).has_changes
+      result = trigger.job.poll(listener).has_changes
       listener.close
       puts "Poll done with #{result}"
     rescue java.io.IOException => e
