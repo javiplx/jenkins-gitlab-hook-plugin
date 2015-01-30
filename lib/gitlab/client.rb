@@ -47,6 +47,11 @@ module Gitlab
       req['PRIVATE-TOKEN'] = token
 
       http = Net::HTTP.new uri.host, uri.port
+      if uri.scheme == 'https'
+        http.use_ssl = true
+        http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      end
+
       res = http.request req
 
       JSON.parse res.body
