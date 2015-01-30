@@ -28,9 +28,10 @@ module Gitlab
     attr_accessor :gitlab_url, :token
 
     def repo_id
-      res = do_request "projects/search/#{name}"
-      raise StandardError.new("No valid match") unless res.length == 1
-      res.first['id']
+      do_request("projects/search/#{name}").each do |repo|
+        return repo['id'] if repo['name'] == name
+      end
+      raise StandardError.new("No valid match")
     end
 
     def do_request(url, data=nil)
