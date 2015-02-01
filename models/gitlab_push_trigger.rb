@@ -23,6 +23,15 @@ class GitlabPushTrigger < Jenkins::Triggers::Trigger
     display_name "Gitlab Trigger Log"
     icon "clipboard.png"
     url_path "GitlabPollLog"
+
+    def log
+      if File.exists? "/tmp/poll.log"
+        log_file = File.new("/tmp/poll.log")
+        '<pre>'+log_file.readlines.collect{ |l| l }.join()+'</pre>'
+      else
+        "Polling has not run yet."
+      end
+    end
   end
 
   class GitlabPollActionProxy

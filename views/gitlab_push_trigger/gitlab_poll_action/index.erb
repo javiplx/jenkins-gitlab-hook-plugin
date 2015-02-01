@@ -1,0 +1,12 @@
+<%
+  l  = taglib("/lib/layout")
+
+  l.layout do
+#    <st:include it="${it.owner}" page="sidepanel.jelly" />
+    l.main_panel do %>
+      <h1>Last GitHub Push</h1>
+      <%= it.log %>
+<%
+    end
+  end
+%>
