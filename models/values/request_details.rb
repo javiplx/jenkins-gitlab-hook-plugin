@@ -38,6 +38,11 @@ module GitlabWebHook
       branch.gsub("/", "_")
     end
 
+    def tagname
+      return "" unless full_branch_reference.start_with?('refs/tags/')
+      full_branch_reference.sub('refs/tags/', '')
+    end
+
     def delete_branch_commit?
       raise NameError.new("should be implemented in concrete implementation")
     end
