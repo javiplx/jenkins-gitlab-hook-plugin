@@ -38,11 +38,6 @@ module GitlabWebHook
       after ? (after.strip.squeeze == "0") : false
     end
 
-    def before
-      return "" unless payload["before"]
-      payload["before"]
-    end
-
     private
 
     def get_commits

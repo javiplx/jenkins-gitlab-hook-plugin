@@ -43,6 +43,10 @@ module GitlabWebHook
       full_branch_reference.sub('refs/tags/', '')
     end
 
+    def poll?
+      tagname.empty?
+    end
+
     def delete_branch_commit?
       raise NameError.new("should be implemented in concrete implementation")
     end
