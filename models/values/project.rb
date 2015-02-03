@@ -41,6 +41,10 @@ module GitlabWebHook
     def matches?(details, branch = false, exactly = false)
       return false unless buildable?
       return false unless matches_uri?(details.repository_uri)
+      if merge_to?( branch || details.branch )
+        logger.info("project #{self} merge target matches #{branch || details.branch}")
+        return true
+      end
       matches_branch?(details, branch, exactly).tap do |matches|
         branch = branch || details.branch
         logger.info("project #{self} #{matches ? "matches": "doesn't match"} the #{branch} branch")
@@ -82,7 +86,7 @@ module GitlabWebHook
     private
 
     def pre_build_merge
-      scm.extensions.get PreBuildMerge.java_class
+      @pre_build_merge ||= scm.extensions.get PreBuildMerge.java_class
     end
 
     def matches_repo_uri?(details_uri)

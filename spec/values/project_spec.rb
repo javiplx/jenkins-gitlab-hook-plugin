@@ -40,6 +40,7 @@ module GitlabWebHook
       before (:each) do
         allow(subject).to receive(:buildable?) { true }
         allow(subject).to receive(:parametrized?) { false }
+        allow(subject).to receive(:pre_build_merge) { nil }
 
         allow(build_chooser).to receive(:java_kind_of?).with(InverseBuildChooser) { false }
 
@@ -86,6 +87,23 @@ module GitlabWebHook
 
         it 'when is buildable, is git, repo uris match and branches match' do
           expect(subject.matches?(details)).to be
+        end
+      end
+
+      context 'when is merge project' do
+        before(:each) do
+          expect(logger).to receive(:info)
+          allow(scm).to receive(:branches) { [BranchSpec.new('origin/nonmatchingbranch')] }
+        end
+
+        it 'and merged branch matchs' do
+          expect(subject).to receive(:merge_to?) { true }
+          expect(subject.matches?(details)).to be
+        end
+
+        it 'and merged branch matchs' do
+          expect(subject).to receive(:merge_to?) { false }
+          expect(subject.matches?(details)).not_to be
         end
       end
 
