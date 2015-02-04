@@ -28,6 +28,15 @@ module Gitlab
 
     attr_accessor :gitlab_url, :token
 
+    def merge_requests(project)
+      source = project.scm.branches.first.name
+      target = project.pre_build_merge.get_options.merge_target
+      do_request("projects/#{id}/merge_requests?state=opened").each do |mr|
+        return mr['id'] if mr['source_branch'] == source && mr['target_branch'] == target
+      end
+      raise StandardError.new("No valid match")
+    end
+
     def repo_id
       do_request("projects/search/#{name}").each do |repo|
         return repo['id'] if repo['ssh_url_to_repo'].end_with?(ssh_url)
