@@ -28,6 +28,10 @@ module Gitlab
 
     attr_accessor :gitlab_url, :token
 
+    def me
+      do_request("user")['id']
+    end
+
     def merge_requests(project)
       source = project.scm.branches.first.name
       target = project.pre_build_merge.get_options.merge_target
