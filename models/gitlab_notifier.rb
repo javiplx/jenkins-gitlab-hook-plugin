@@ -30,7 +30,12 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
     env = build.native.environment listener
     parents = StringIO.new
     launcher.execute('git', 'log', '-1', '--oneline' ,'--format=%P', {:out => parents, :chdir => build.workspace} )
-    client.post_status( parents.string.split.last , build.native.result , env['BUILD_URL'] )
+    parents_a = parents.string.split
+    if parents_a.length == 1
+      client.post_status( env['GIT_COMMIT'] , build.native.result , env['BUILD_URL'] )
+    else
+      client.post_status( parents_a.last , build.native.result , env['BUILD_URL'] )
+    end
   end
 
   class GitlabNotifierDescriptor < Jenkins::Model::DefaultDescriptor
