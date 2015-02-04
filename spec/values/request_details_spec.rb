@@ -95,6 +95,18 @@ module GitlabWebHook
         allow(subject).to receive(:full_branch_reference) { 'refs/heads/feature/new_hot_feature' }
         expect(subject.branch).to eq('feature/new_hot_feature')
       end
+
+      it 'returns empty tag name' do
+        allow(subject).to receive(:full_branch_reference) { 'refs/heads/master' }
+        expect(subject.tagname).to eq('')
+      end
+    end
+
+    context 'with tag' do
+      it 'extracts tag name from payload' do
+        allow(subject).to receive(:full_branch_reference) { 'refs/tags/v1.0.0' }
+        expect(subject.tagname).to eq('v1.0.0')
+      end
     end
 
     context 'with delete branch commit' do
