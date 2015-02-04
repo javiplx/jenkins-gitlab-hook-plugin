@@ -4,7 +4,7 @@ require 'json'
 module Gitlab
   class Client
 
-    attr_reader :id, :name
+    attr_reader :id, :ssh_url, :name
 
     def initialize(descriptor, repo_name=nil)
       @gitlab_url = descriptor.gitlab_url
@@ -12,8 +12,9 @@ module Gitlab
       self.name = repo_name if repo_name
     end
 
-    def name=(repo_name)
-      if @name = repo_name
+    def name=(repo_namespace)
+      if @name = repo_namespace.split('/').last.split('.')[0]
+        @ssh_url = repo_namespace
         @id = repo_id
       end
     end
@@ -29,7 +30,7 @@ module Gitlab
 
     def repo_id
       do_request("projects/search/#{name}").each do |repo|
-        return repo['id'] if repo['name'] == name
+        return repo['id'] if repo['ssh_url_to_repo'].end_with?(ssh_url)
       end
       raise StandardError.new("No valid match")
     end

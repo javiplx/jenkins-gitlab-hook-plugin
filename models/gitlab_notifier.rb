@@ -20,7 +20,7 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
 
   def prebuild(build, listener)
     puts "#{self.class}#prebuild( #{build} , #{listener} )"
-    client.name = repo_name(build)
+    client.name = repo_namespace(build)
     env = build.native.environment listener
     client.post_status( env['GIT_COMMIT'] , 'running' , env['BUILD_URL'] )
   end
@@ -106,10 +106,10 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
     @client = Gitlab::Client.new @descriptor
   end
 
-  def repo_name(build)
+  def repo_namespace(build)
     project_scm = build.native.project.scm
     repo_url = project_scm.repositories.first.getURIs.first.to_s
-    repo_url.split(':')[1].split('/')[1].split('.')[0]
+    repo_url.split(':')[1]
   end
 
 end
