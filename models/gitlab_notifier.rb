@@ -9,24 +9,20 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
   attr_reader :client
 
   def initialize(attrs)
-    puts "#{self.class}#initialize #{attrs}"
     create_client
   end
 
   def read_completed
-    puts "#{self.class}#read_completed ... #{@plugin} - #{@pluginid} - #{@object}"
     create_client
   end
 
   def prebuild(build, listener)
-    puts "#{self.class}#prebuild( #{build} , #{listener} )"
     client.name = repo_namespace(build)
     env = build.native.environment listener
     client.post_status( env['GIT_COMMIT'] , 'running' , env['BUILD_URL'] )
   end
 
   def perform(build, launcher, listener)
-    puts "#{self.class}#perform( #{build} , #{launcher} , #{listener} )"
     env = build.native.environment listener
     parents = StringIO.new
     launcher.execute('git', 'log', '-1', '--oneline' ,'--format=%P', {:out => parents, :chdir => build.workspace} )
