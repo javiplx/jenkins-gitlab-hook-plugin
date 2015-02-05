@@ -49,12 +49,21 @@ module Gitlab
 
     def post_commit_note(commit, status, ci_url)
       url = "projects/#{id}/repository/commits/#{commit}/comments"
-      do_request url, :note => "{ 'author': { 'id': #{me} }, 'note':'[Jenkins CI result #{status}](#{ci_url})' }"
+      do_request url, :note => comment(status, ci_url).to_json
     end
 
     def post_mr_note(mr_id, status, ci_url)
       url = "projects/#{id}/merge_request/#{mr_id}/comments"
-      do_request url, :note => "{ 'author': { 'id': #{me} }, 'note':'[Jenkins CI result #{status}](#{ci_url})' }"
+      do_request url, :note => comment(status, ci_url).to_json
+    end
+
+    def comment(status, ci_url)
+      {
+       :author => {
+          :id => me
+          },
+        :note => "[Jenkins CI result #{status}](#{ci_url})"
+      }
     end
 
     def me
