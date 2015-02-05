@@ -25,11 +25,14 @@ module Gitlab
       do_request("projects/#{id}/merge_requests?state=opened").each do |mr|
         return mr['id'] if mr['source_branch'] == source && mr['target_branch'] == target
       end
+      return -1
     end
 
     def post_status(commit, status, ci_url, mr_id=nil)
       if mr_id.nil?
         post_commit_status(commit, status, ci_url)
+      elsif mr_id == -1
+        post_commit_note(comit, status, ci_url)
       else
         post_mr_note(mr_id, status, ci_url)
       end
@@ -42,6 +45,11 @@ module Gitlab
     def post_commit_status(commit, status, ci_url)
       url = "projects/#{id}/repository/commits/#{commit}/status"
       do_request url, :state => status, :target_url => ci_url
+    end
+
+    def post_commit_note(commit, status, ci_url)
+      url = "projects/#{id}/repository/commits/#{commit}/comments"
+      do_request url, :note => "{ 'author': { 'id': #{me} }, 'note':'[Jenkins CI result #{status}](#{ci_url})' }"
     end
 
     def post_mr_note(mr_id, status, ci_url)

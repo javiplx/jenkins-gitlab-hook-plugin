@@ -26,7 +26,7 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
   def perform(build, launcher, listener)
     project = GitlabWebHook::Project.new build.native
     mr_id = client.merge_request(project)
-    return if mr_id.nil? && descriptor.mr_status_only?
+    return if mr_id == -1 && descriptor.mr_status_only?
     env = build.native.environment listener
     parents = StringIO.new
     launcher.execute('git', 'log', '-1', '--oneline' ,'--format=%P', {:out => parents, :chdir => build.workspace} )
