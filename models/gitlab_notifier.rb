@@ -41,6 +41,14 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
 
     attr_reader :gitlab_url, :token
 
+    def commit_status?
+      @commit_status == 'true'
+    end
+
+    def mr_status_only?
+      @mr_status_only == 'true'
+    end
+
     def initialize(describable, object, describable_type)
       super
       load
@@ -53,6 +61,8 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
       if xmldoc.root
         @gitlab_url = xmldoc.root.elements['gitlab_url'].text
         @token = xmldoc.root.elements['token'].text
+        @commit_status = xmldoc.root.elements['commit_status'].nil? ? 'false' : xmldoc.root.elements['commit_status'].text
+        @mr_status_only = xmldoc.root.elements['mr_status_only'].nil? ? 'true' : xmldoc.root.elements['mr_status_only'].text
       end
     end
 
@@ -69,6 +79,8 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
 
       doc.root.add_element( 'gitlab_url' ).add_text( gitlab_url )
       doc.root.add_element( 'token' ).add_text( token )
+      doc.root.add_element( 'commit_status' ).add_text( @commit_status )
+      doc.root.add_element( 'mr_status_only' ).add_text( @mr_status_only )
 
       f = File.open(configFile.file.canonicalPath, 'wb')
       f.puts("<?xml version='#{doc.version}' encoding='#{doc.encoding}'?>")
@@ -88,6 +100,8 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
     def parse(form)
       @gitlab_url = form["gitlab_url"]
       @token = form['token']
+      @commit_status = form['commit_status'] ? 'true' : 'false'
+      @mr_status_only = form['mr_status_only'] ? 'true' : 'false'
     end
 
   end
