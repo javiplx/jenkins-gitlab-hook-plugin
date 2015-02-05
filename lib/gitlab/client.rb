@@ -19,6 +19,14 @@ module Gitlab
       end
     end
 
+    def merge_request(project)
+      source = project.scm.branches.first.name
+      target = project.pre_build_merge.get_options.merge_target
+      do_request("projects/#{id}/merge_requests?state=opened").each do |mr|
+        return mr['id'] if mr['source_branch'] == source && mr['target_branch'] == target
+      end
+    end
+
     def post_status(commit, status, ci_url)
       url = "projects/#{id}/repository/commits/#{commit}/status"
       do_request url, :state => status, :target_url => ci_url
@@ -30,15 +38,6 @@ module Gitlab
 
     def me
       do_request("user")['id']
-    end
-
-    def merge_requests(project)
-      source = project.scm.branches.first.name
-      target = project.pre_build_merge.get_options.merge_target
-      do_request("projects/#{id}/merge_requests?state=opened").each do |mr|
-        return mr['id'] if mr['source_branch'] == source && mr['target_branch'] == target
-      end
-      raise StandardError.new("No valid match")
     end
 
     def repo_id
