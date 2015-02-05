@@ -32,9 +32,9 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
     launcher.execute('git', 'log', '-1', '--oneline' ,'--format=%P', {:out => parents, :chdir => build.workspace} )
     parents_a = parents.string.split
     if parents_a.length == 1
-      client.post_status( env['GIT_COMMIT'] , build.native.result , env['BUILD_URL'] )
+      client.post_status( env['GIT_COMMIT'] , build.native.result , env['BUILD_URL'] , descriptor.commit_status? ? nil : mr_id )
     else
-      client.post_status( parents_a.last , build.native.result , env['BUILD_URL'] )
+      client.post_status( parents_a.last , build.native.result , env['BUILD_URL'] , descriptor.commit_status? ? nil : mr_id )
     end
   end
 

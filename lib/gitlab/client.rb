@@ -27,14 +27,27 @@ module Gitlab
       end
     end
 
-    def post_status(commit, status, ci_url)
-      url = "projects/#{id}/repository/commits/#{commit}/status"
-      do_request url, :state => status, :target_url => ci_url
+    def post_status(commit, status, ci_url, mr_id=nil)
+      if mr_id.nil?
+        post_commit_status(commit, status, ci_url)
+      else
+        post_mr_note(mr_id, status, ci_url)
+      end
     end
 
     private
 
     attr_accessor :gitlab_url, :token
+
+    def post_commit_status(commit, status, ci_url)
+      url = "projects/#{id}/repository/commits/#{commit}/status"
+      do_request url, :state => status, :target_url => ci_url
+    end
+
+    def post_mr_note(mr_id, status, ci_url)
+      url = "projects/#{id}/merge_request/#{mr_id}/comments"
+      do_request url, :note => "{ 'author': { 'id': #{me} }, 'note':'[Jenkins CI result #{status}](#{ci_url})' }"
+    end
 
     def me
       do_request("user")['id']
