@@ -109,6 +109,31 @@ module GitlabWebHook
       end
     end
 
+    context '#skip_poll!' do
+      before :each do
+        subject.skip_poll!
+      end
+      it 'skips poll on non-tags pushes' do
+        expect(subject).to receive(:full_branch_reference) { 'refs/heads/master' }
+        expect(subject.poll?).to eq(false)
+      end
+      it 'skips poll on tag push' do
+        expect(subject).to receive(:full_branch_reference).twice { 'refs/tags/v1.0.0' }
+        expect(subject.poll?).to eq(false)
+      end
+    end
+
+    context '#poll?' do
+      it 'is true by deault' do
+        expect(subject).to receive(:full_branch_reference) { 'refs/heads/master' }
+        expect(subject.poll?).to eq(true)
+      end
+      it 'is false when tag is pushed' do
+        expect(subject).to receive(:full_branch_reference).twice { 'refs/tags/v1.0.0' }
+        expect(subject.poll?).to eq(false)
+      end
+    end
+
     context 'with delete branch commit' do
       it 'expects to implemented in concrete implementation' do
         expect { subject.repository_url }.to raise_exception(NameError)
