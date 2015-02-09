@@ -71,6 +71,11 @@ module GitlabWebHook
           new_project.scm = cloned_scm
           new_project.makeDisabled(false)
           new_project.description = @settings.description
+          removals = [ 'Mailer', 'SonarPublisher', 'GitPublisher' ]
+          new_project.publishers.each do |publisher|
+            classname = publisher.descriptor.id.split('.').last
+            new_project.publishers.remove(publisher) if removals.include?(classname)
+          end
           new_project.save
         end
 
