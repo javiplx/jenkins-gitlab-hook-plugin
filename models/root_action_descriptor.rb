@@ -120,13 +120,11 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
         @any_branch_pattern         = form["autocreate"]["any_branch_pattern"]
       end
       @template = form['template']
-      @templates = form['templates'] && form['templates'].inject({}) do |hash, item|
-        hash[item['string']] = item['project']
-        hash
+      @templates = form['templates'] && form2list( form['templates'] ).inject({}) do |hash, item|
+        hash.update( item['string'] => item['project'] )
       end
-      @group_templates = form['group_templates'] && form['group_templates'].inject({}) do |hash, item|
-        hash[item['string']] = item['project']
-        hash
+      @group_templates = form['group_templates'] && form2list( form['group_templates'] ).inject({}) do |hash, item|
+        hash.update( item['string'] => item['project'] )
       end
     end
 
@@ -136,6 +134,10 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
 
     def use_master_project_name
       @use_master_project_name.nil? ? false : @use_master_project_name
+    end
+
+    def form2list(form_item)
+      form_item.is_a?(Java::NetSfJson::JSONArray) ? form_item : [].push( form_item )
     end
 
     def get_templates(templates)
