@@ -28,12 +28,13 @@ module GitlabWebHook
 
     extend Forwardable
 
-    def_delegators :@jenkins_project, :scm, :schedulePolling, :scheduleBuild2, :fullName, :isParameterized, :isBuildable, :getQuietPeriod, :getProperty, :delete, :description
+    def_delegators :@jenkins_project, :scm, :schedulePolling, :scheduleBuild2, :fullName, :isParameterized, :isBuildable, :getQuietPeriod, :getProperty, :delete, :description, :getPublishersList
 
     alias_method :parametrized?, :isParameterized
     alias_method :buildable?, :isBuildable
     alias_method :name, :fullName
     alias_method :to_s, :fullName
+    alias_method :publishers, :getPublishersList
 
     attr_reader :jenkins_project, :scms, :logger
     attr_reader :matching_scms
