@@ -21,9 +21,10 @@ module Gitlab
 
     def merge_request(project)
       source = project.scm.branches.first.name
-      target = project.pre_build_merge.get_options.merge_target
-      do_request("projects/#{id}/merge_requests?state=opened").each do |mr|
-        return mr['id'] if mr['source_branch'] == source && mr['target_branch'] == target
+      if target = project.merge_target
+        do_request("projects/#{id}/merge_requests?state=opened").each do |mr|
+          return mr['id'] if mr['source_branch'] == source && mr['target_branch'] == target
+        end
       end
       return -1
     end

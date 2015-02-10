@@ -66,6 +66,11 @@ module GitlabWebHook
       getProperty(ParametersDefinitionProperty.java_class).getParameterDefinitions()
     end
 
+    def merge_target
+      return nil unless pre_build_merge?
+      pre_build_merge.get_options.merge_target
+    end
+
     private
 
     def matches_repo_uri?(details_uri)
