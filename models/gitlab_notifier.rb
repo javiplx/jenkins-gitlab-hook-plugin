@@ -2,7 +2,7 @@ require 'gitlab'
 
 class GitlabNotifier < Jenkins::Tasks::Publisher
 
-  display_name 'Gitlab Notifier'
+  display_name 'Gitlab commit status publisher'
 
   transient :descriptor, :client
 
@@ -18,13 +18,14 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
 
   def prebuild(build, listener)
     return unless descriptor.commit_status?
-    client.name = repo_namespace(build)
+    project = GitlabWebHook::Project.new build.native.project
+    client.name = repo_namespace(project)
     env = build.native.environment listener
     client.post_status( env['GIT_COMMIT'] , 'running' , env['BUILD_URL'] )
   end
 
   def perform(build, launcher, listener)
-    project = GitlabWebHook::Project.new build.native
+    project = GitlabWebHook::Project.new build.native.project
     mr_id = client.merge_request(project)
     return if mr_id == -1 && descriptor.mr_status_only?
     env = build.native.environment listener
@@ -119,9 +120,8 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
     @client = Gitlab::Client.new @descriptor
   end
 
-  def repo_namespace(build)
-    project_scm = build.native.project.scm
-    repo_url = project_scm.repositories.first.getURIs.first.to_s
+  def repo_namespace(project)
+    repo_url = project.scm.repositories.first.getURIs.first.to_s
     repo_url.split(':')[1]
   end
 
