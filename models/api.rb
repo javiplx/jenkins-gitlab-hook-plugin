@@ -8,14 +8,9 @@ require_relative 'use_cases/process_delete_commit'
 require_relative 'use_cases/process_merge_request'
 require_relative 'services/parse_request'
 
-include Java
-
-java_import Java.java.util.logging.Logger
-java_import Java.java.util.logging.Level
-
 module GitlabWebHook
   class Api < Sinatra::Base
-    LOGGER = Logger.getLogger(Api.class.name)
+    LOGGER = Java.java.util.logging.Logger.getLogger(Api.class.name)
 
     get '/ping' do
       'Gitlab Web Hook is up and running :-)'

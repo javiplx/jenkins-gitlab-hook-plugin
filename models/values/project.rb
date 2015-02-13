@@ -10,8 +10,6 @@ java_import Java.hudson.plugins.git.GitSCM
 java_import Java.hudson.plugins.git.util.InverseBuildChooser
 java_import Java.hudson.plugins.git.extensions.impl.PreBuildMerge
 
-java_import Java.java.util.logging.Logger
-
 module GitlabWebHook
   class Project
     extend Forwardable
@@ -25,7 +23,7 @@ module GitlabWebHook
 
     attr_reader :jenkins_project
 
-    LOGGER = Logger.getLogger(Project.class.name)
+    LOGGER = Java.java.util.logging.Logger.getLogger(Project.class.name)
 
     def initialize(jenkins_project, logger = nil)
       raise ArgumentError.new("jenkins project is required") unless jenkins_project
@@ -81,6 +79,11 @@ module GitlabWebHook
     def get_default_parameters
       # @see jenkins.model.ParameterizedJobMixIn.getDefaultParametersValues used in hudson.model.AbstractProject
       getProperty(ParametersDefinitionProperty.java_class).getParameterDefinitions()
+    end
+
+    def merge_target
+      return nil unless pre_build_merge?
+      pre_build_merge.get_options.merge_target
     end
 
     private

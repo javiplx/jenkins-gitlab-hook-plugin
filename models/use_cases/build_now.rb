@@ -4,12 +4,13 @@ require_relative '../services/get_build_actions'
 
 include Java
 
-java_import Java.java.util.logging.Logger
-java_import Java.java.util.logging.Level
 java_import Java.hudson.util.StreamTaskListener
 
 module GitlabWebHook
   class BuildNow
+    java_import Java.java.util.logging.Logger
+    java_import Java.java.util.logging.Level
+
     LOGGER = Logger.getLogger(self.class.name)
 
     attr_reader :project

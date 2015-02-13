@@ -1,12 +1,10 @@
 require_relative '../services/get_jenkins_projects'
 
-include Java
-
-java_import Java.java.util.logging.Logger
-java_import Java.java.util.logging.Level
-
 module GitlabWebHook
   class NotifyCommit
+    java_import Java.java.util.logging.Logger
+    java_import Java.java.util.logging.Level
+
     LOGGER = Logger.getLogger(NotifyCommit.class.name)
 
     attr_reader :project
