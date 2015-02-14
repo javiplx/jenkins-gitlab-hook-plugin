@@ -96,9 +96,9 @@ module GitlabWebHook
         expect(subject.branch).to eq('feature/new_hot_feature')
       end
 
-      it 'returns empty tag name' do
+      it 'returns no tagname' do
         allow(subject).to receive(:full_branch_reference) { 'refs/heads/master' }
-        expect(subject.tagname).to eq('')
+        expect(subject.tagname).to eq(nil)
       end
     end
 
@@ -200,9 +200,18 @@ module GitlabWebHook
         end
       end
 
+      it 'tagname absent' do
+        expect(subject.flat_payload.keys).not_to include( 'tagname' )
+      end
+
       it 'memoizes flattened payload' do
         expect(payload).to receive(:to_flat_keys).once.and_return({})
         10.times { subject.flat_payload }
+      end
+
+      it 'returns tagname if present' do
+        allow(subject).to receive('full_branch_reference') { 'refs/tags/v1.0.0' }
+        expect(subject.flat_payload['tagname']).to eq('v1.0.0')
       end
     end
   end

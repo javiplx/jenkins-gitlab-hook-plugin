@@ -44,7 +44,7 @@ module GitlabWebHook
     end
 
     def tagname
-      return "" unless full_branch_reference.start_with?('refs/tags/')
+      return nil unless full_branch_reference.start_with?('refs/tags/')
       full_branch_reference.sub('refs/tags/', '')
     end
 
@@ -53,7 +53,7 @@ module GitlabWebHook
     end
 
     def poll?
-      tagname.empty? && @poll
+      tagname.nil? && @poll
     end
 
     def delete_branch_commit?
@@ -85,6 +85,7 @@ module GitlabWebHook
           :full_branch_reference,
           :branch
         ].each { |detail| flattened[detail.to_s] = self.send(detail) }
+        flattened['tagname'] = tagname unless tagname.nil?
       end
     end
 

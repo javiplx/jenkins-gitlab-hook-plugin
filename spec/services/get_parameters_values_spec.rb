@@ -74,12 +74,14 @@ module GitlabWebHook
         allow(project).to receive(:get_default_parameters) { [
           build_parameter('not_IN_payload', 'default value'),
           build_parameter('BEFORE'),
+          build_parameter('TAGNAME', '*'),
           build_parameter('commit_BRANCH_parameter')
         ] }
         allow(details).to receive(:branch) { 'commit_branch' }
         expect(subject.with(project, details)[0].value).to eq('default value')
         expect(subject.with(project, details)[1].value).to eq('95790bf891e76fee5e1747ab589903a6a1f80f22')
-        expect(subject.with(project, details)[2].value).to eq('commit_branch')
+        expect(subject.with(project, details)[2].value).to eq('*')
+        expect(subject.with(project, details)[3].value).to eq('commit_branch')
       end
 
       it 'leaves non string parameters as is' do
@@ -88,6 +90,16 @@ module GitlabWebHook
         end
         allow(project).to receive(:get_default_parameters) { [boolean_parameter] }
         expect(subject.with(project, details)[0].value).to eq(true)
+      end
+    end
+
+    context 'with a TAGNAME parameter' do
+      it 'is case insensitive' do
+        allow(project).to receive(:get_default_parameters) { [
+          build_parameter('TAGNAME', '*')
+        ] }
+        allow(details).to receive(:full_branch_reference) { 'refs/tags/v1.0.0' }
+        expect(subject.with(project, details)[0].value).to eq('v1.0.0')
       end
     end
 
