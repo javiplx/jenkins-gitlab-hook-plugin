@@ -54,7 +54,7 @@ module GitlabWebHook
       if scm.repositories.size > 0
         branch_name_param = get_default_parameters.find do |param|
           scm.branches.find do |scm_branch|
-            scm_branch.name.match(/.*\$?\{?#{param.name}\}?.*/)
+            scm_branch.name.match(/.*\$?\{?#{param.name}\}?.*/) && param.name.downcase != 'tagname'
           end
         end
       end
