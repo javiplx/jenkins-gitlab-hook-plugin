@@ -33,7 +33,7 @@ module GitlabWebHook
       let(:repository) { double('RemoteConfig', name: 'origin', getURIs: [double(URIish)]) }
       let(:refspec) { double('RefSpec') }
       let(:details_uri) { double(RepositoryUri) }
-      let(:details) { double(RequestDetails, branch: 'master', repository_uri: details_uri, full_branch_reference: 'refs/heads/master') }
+      let(:details) { double(RequestDetails, branch: 'master', repository_uri: details_uri, full_branch_reference: 'refs/heads/master', tagname: nil) }
       let(:branch) { BranchSpec.new('origin/master') }
       let(:build_chooser) { double('BuildChooser') }
 

@@ -54,7 +54,7 @@ module GitlabWebHook
       if scm.repositories.size > 0
         branch_name_param = get_default_parameters.find do |param|
           scm.branches.find do |scm_branch|
-            scm_branch.name.match(/.*\$?\{?#{param.name}\}?.*/) && param.name.downcase != 'tagname'
+            scm_branch.name.match(/.*\$?\{?#{param.name}\}?.*/)
           end
         end
       end
@@ -94,7 +94,14 @@ module GitlabWebHook
         end
       end
 
-      matched_branch = get_branch_name_parameter if !matched_branch && matched_refs.any? && parametrized?
+      if !matched_branch && matched_refs.any? && parametrized?
+        branch_param = get_branch_name_parameter
+        if branch_param && branch_param.name.downcase == 'tagname'
+          matched_branch = branch_param if details.tagname
+        else
+          matched_branch = branch_param unless details.tagname
+        end
+      end
 
       build_chooser = scm.buildChooser
       build_chooser && build_chooser.java_kind_of?(InverseBuildChooser) ? !matched_branch : matched_branch
