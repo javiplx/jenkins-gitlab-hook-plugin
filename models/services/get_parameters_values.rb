@@ -32,7 +32,7 @@ module GitlabWebHook
       branch_parameter = project.get_branch_name_parameter
       if branch_parameter
         values.reject! { |value| value.name.downcase == branch_parameter.name.downcase }
-        values << StringParameterValue.new(branch_parameter.name, details.branch)
+        values << StringParameterValue.new(branch_parameter.name, branch_parameter.name.downcase == 'tagname' ? details.tagname : details.branch)
       end
     end
 
