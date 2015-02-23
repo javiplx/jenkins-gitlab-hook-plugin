@@ -31,8 +31,17 @@ module GitlabWebHook
     def apply_branch(project, details, values)
       branch_parameter = project.get_branch_name_parameter
       if branch_parameter
-        values.reject! { |value| value.name.downcase == branch_parameter.name.downcase }
-        values << StringParameterValue.new(branch_parameter.name, branch_parameter.name.downcase == 'tagname' ? details.tagname : details.branch)
+
+        if branch_parameter.name.downcase == 'tagname' && details.tagname
+          values.reject! { |value| value.name.downcase == branch_parameter.name.downcase }
+          values << StringParameterValue.new(branch_parameter.name, details.tagname)
+        end
+
+        if branch_parameter.name.downcase != 'tagname' && details.tagname.nil?
+          values.reject! { |value| value.name.downcase == branch_parameter.name.downcase }
+          values << StringParameterValue.new(branch_parameter.name, details.branch)
+        end
+
       end
     end
 
