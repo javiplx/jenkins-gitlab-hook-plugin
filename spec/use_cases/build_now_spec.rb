@@ -2,7 +2,7 @@ require 'spec_helper'
 
 module GitlabWebHook
   describe BuildNow do
-    let(:details) { double(RequestDetails, payload: double, before: 'non-empty-sha1') }
+    let(:details) { double(RequestDetails, payload: double, poll?: true)}
     let(:project) { double(Project, ignore_notify_commit?: false, buildable?: true, getQuietPeriod: double) }
     let(:logger) { double }
     let(:subject) { BuildNow.new(project, logger) }
@@ -24,6 +24,15 @@ module GitlabWebHook
     end
 
     context 'when there are no SCM changes' do
+      let(:cause_builder) { double(with: true) }
+      let(:actions_builder) { double(with: true) }
+
+      it 'trigger build when polling disabled' do
+        expect(details).to receive(:poll?) { false }
+        expect(project).not_to receive(:poll)
+        expect(project).to receive(:scheduleBuild2)
+        expect(subject.with(details, cause_builder, actions_builder)).to match('scheduled for build')
+      end
       it 'skips the build' do
         expect(StreamTaskListener).to receive('new')
         expect(project).to receive(:poll).and_return( double(has_changes?: false) )
@@ -33,12 +42,10 @@ module GitlabWebHook
     end
 
     context 'when build triggered' do
-      let(:cause_builder) { double }
-      let(:actions_builder) { double }
+      let(:cause_builder) { double(with: true) }
+      let(:actions_builder) { double(with: true) }
 
       before(:each) do
-        expect(cause_builder).to receive(:with).with(details)
-        expect(actions_builder).to receive(:with).with(project, details)
         expect(StreamTaskListener).to receive('new')
         expect(project).to receive(:poll).and_return( double(has_changes?: true) )
       end

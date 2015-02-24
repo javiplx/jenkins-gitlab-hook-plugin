@@ -81,6 +81,43 @@ module GitlabWebHook
         allow(subject).to receive(:full_branch_reference) { 'refs/heads/feature/new_hot_feature' }
         expect(subject.branch).to eq('feature/new_hot_feature')
       end
+
+      it 'returns no tagname' do
+        allow(subject).to receive(:full_branch_reference) { 'refs/heads/master' }
+        expect(subject.tagname).to eq(nil)
+      end
+    end
+
+    context 'with tag' do
+      it 'extracts tag name from payload' do
+        allow(subject).to receive(:full_branch_reference) { 'refs/tags/v1.0.0' }
+        expect(subject.tagname).to eq('v1.0.0')
+      end
+    end
+
+    context '#skip_poll!' do
+      before :each do
+        subject.skip_poll!
+      end
+      it 'skips poll on non-tags pushes' do
+        expect(subject).to receive(:full_branch_reference) { 'refs/heads/master' }
+        expect(subject.poll?).to eq(false)
+      end
+      it 'skips poll on tag push' do
+        expect(subject).to receive(:full_branch_reference).twice { 'refs/tags/v1.0.0' }
+        expect(subject.poll?).to eq(false)
+      end
+    end
+
+    context '#poll?' do
+      it 'is true by deault' do
+        expect(subject).to receive(:full_branch_reference) { 'refs/heads/master' }
+        expect(subject.poll?).to eq(true)
+      end
+      it 'is false when tag is pushed' do
+        expect(subject).to receive(:full_branch_reference).twice { 'refs/tags/v1.0.0' }
+        expect(subject.poll?).to eq(false)
+      end
     end
 
     context 'with delete branch commit' do
@@ -149,9 +186,18 @@ module GitlabWebHook
         end
       end
 
+      it 'tagname absent' do
+        expect(subject.flat_payload.keys).not_to include( 'tagname' )
+      end
+
       it 'memoizes flattened payload' do
         expect(payload).to receive(:to_flat_keys).once.and_return({})
         10.times { subject.flat_payload }
+      end
+
+      it 'returns tagname if present' do
+        allow(subject).to receive('full_branch_reference') { 'refs/tags/v1.0.0' }
+        expect(subject.flat_payload['tagname']).to eq('v1.0.0')
       end
     end
   end

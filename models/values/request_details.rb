@@ -4,6 +4,10 @@ require_relative '../services/flat_keys_hash'
 module GitlabWebHook
   class RequestDetails < AbstractDetails
 
+    def initialize
+      @poll = true
+    end
+
     def valid?
       repository_url.to_s.strip.empty? ? false : true
     end
@@ -14,6 +18,19 @@ module GitlabWebHook
 
       refs = ref.split("/")
       refs.reject { |ref| ref =~ /\A(ref|head)s?\z/ }.join("/")
+    end
+
+    def tagname
+      return nil unless full_branch_reference.start_with?('refs/tags/')
+      full_branch_reference.sub('refs/tags/', '')
+    end
+
+    def skip_poll!
+      @poll = false
+    end
+
+    def poll?
+      tagname.nil? && @poll
     end
 
     def delete_branch_commit?
@@ -39,6 +56,7 @@ module GitlabWebHook
           :full_branch_reference,
           :branch
         ].each { |detail| flattened[detail.to_s] = self.send(detail) }
+        flattened['tagname'] = tagname unless tagname.nil?
       end
     end
 
