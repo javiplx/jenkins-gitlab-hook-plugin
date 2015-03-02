@@ -30,8 +30,12 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
     return if mr_id == -1 && descriptor.mr_status_only?
     env = build.native.environment listener
     parents = StringIO.new
-    launcher.execute('git', 'log', '-1', '--oneline' ,'--format=%P', {:out => parents, :chdir => build.workspace} )
-    parents_a = parents.string.split
+    if launcher.execute('git', 'log', '-1', '--oneline' ,'--format=%P', {:out => parents, :chdir => build.workspace} ) == 0
+      parents_a = parents.string.split
+    else
+      listener.warning( "git-log failed : '#{parents.join(' ')}'" )
+      parents_a = [ env['GIT_COMMIT'] ]
+    end
     if parents_a.length == 1
       client.post_status( env['GIT_COMMIT'] , build.native.result , env['BUILD_URL'] , descriptor.commit_status? ? nil : mr_id )
     else
