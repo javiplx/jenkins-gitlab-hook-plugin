@@ -21,7 +21,8 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
     project = GitlabWebHook::Project.new build.native.project
     client.name = repo_namespace(project)
     env = build.native.environment listener
-    client.post_status( env['GIT_COMMIT'] , 'running' , env['BUILD_URL'] )
+    commit = remote_commit( build , launcher , listener )
+    client.post_status( commit , 'running' , env['BUILD_URL'] )
   end
 
   def perform(build, launcher, listener)
