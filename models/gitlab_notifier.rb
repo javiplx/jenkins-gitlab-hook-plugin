@@ -29,14 +29,8 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
     mr_id = client.merge_request(project)
     return if mr_id == -1 && descriptor.mr_status_only?
     env = build.native.environment listener
-    parent_commits = [ env['GIT_COMMIT'] ]
-    parents = StringIO.new
-    if launcher.execute('git', 'log', '-1', '--oneline' ,'--format=%P', {:out => parents, :chdir => build.workspace} ) == 0
-      parent_commits.concat( parents.string.split )
-    else
-      listener.warning( "git-log failed : '#{parents.join(' ')}'" )
-    end
-    client.post_status( parent_commits.last , build.native.result , env['BUILD_URL'] , descriptor.commit_status? ? nil : mr_id )
+    commit = remote_commit( build , launcher , listener )
+    client.post_status( commit , build.native.result , env['BUILD_URL'] , descriptor.commit_status? ? nil : mr_id )
   end
 
   class GitlabNotifierDescriptor < Jenkins::Model::DefaultDescriptor
@@ -114,6 +108,18 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
   describe_as Java.hudson.tasks.Publisher, :with => GitlabNotifierDescriptor
 
   private
+
+  def remote_commit( build , launcher , listener )
+    env = build.native.environment listener
+    commits = [ env['GIT_COMMIT'] ]
+    parents = StringIO.new
+    if launcher.execute('git', 'log', '-1', '--oneline' ,'--format=%P', {:out => parents, :chdir => build.workspace} ) == 0
+      commits.concat( parents.string.split )
+    else
+      listener.warning( "git-log failed : '#{parents.join(' ')}'" )
+    end
+    commits.last
+  end
 
   def create_client
     @descriptor = Jenkins::Plugin.instance.descriptors[GitlabNotifier]
