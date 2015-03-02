@@ -109,11 +109,19 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
 
   private
 
+  def clone_dir( build )
+    if local_branch = GitlabWebHook::Project.new(build.native.project).local_clone
+      build.workspace + local_branch
+    else
+      build.workspace
+    end
+  end
+
   def remote_commit( build , launcher , listener )
     env = build.native.environment listener
     commits = [ env['GIT_COMMIT'] ]
     parents = StringIO.new
-    if launcher.execute('git', 'log', '-1', '--oneline' ,'--format=%P', {:out => parents, :chdir => build.workspace} ) == 0
+    if launcher.execute('git', 'log', '-1', '--oneline' ,'--format=%P', {:out => parents, :chdir => clone_dir(build)} ) == 0
       commits.concat( parents.string.split )
     else
       listener.warning( "git-log failed : '#{parents.join(' ')}'" )
