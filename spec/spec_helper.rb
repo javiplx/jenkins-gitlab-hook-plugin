@@ -2,6 +2,9 @@
 require 'json'
 require 'ostruct'
 
+require 'coveralls'
+Coveralls.wear!
+
 # java dependencies
 Dir["spec/lib/**/*.jar"].each do |jar|
   require jar
