@@ -3,14 +3,6 @@ module Jenkins::Triggers
   class TriggerDescriptor < Java.hudson.triggers.TriggerDescriptor
     include Jenkins::Model::Descriptor
 
-    java_import Java.hudson.util.SequentialExecutionQueue
-    java_import Java.jenkins.model.Jenkins
-
-    def queue
-      # Seems the same than Jenkins.instance.queue
-      @queue ||= SequentialExecutionQueue.new(Jenkins::MasterComputer.threadPoolForRemoting)
-    end
-
     # Returns true if this trigger is applicable to the given Item
     #
     # @param [Boolean] true to allow user to configure a trigger for this item

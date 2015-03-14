@@ -12,6 +12,18 @@ class GitlabPushTrigger < Jenkins::Triggers::Trigger
     type.is_a? Java::HudsonModel::Project
   end
 
+  class DescriptorImpl < Jenkins::Triggers::TriggerDescriptor
+    java_import Java.hudson.util.SequentialExecutionQueue
+    java_import Java.jenkins.model.Jenkins
+
+    def queue
+      # Seems the same than Jenkins.instance.queue
+      @queue ||= SequentialExecutionQueue.new(Jenkins::MasterComputer.threadPoolForRemoting)
+    end
+  end
+
+  describe_as Java.hudson.triggers.Trigger, :with => DescriptorImpl
+
   private
 
   class PollRunner
