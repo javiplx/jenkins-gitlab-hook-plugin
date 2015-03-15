@@ -1,20 +1,12 @@
-require 'rexml/document'
+require 'jenkins/model/global_descriptor'
 
-java_import Java.hudson.BulkChange
-java_import Java.hudson.model.listeners.SaveableListener
-
-class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
+class GitlabWebHookRootActionDescriptor < Jenkins::Model::GlobalDescriptor
   # TODO a hook to delete artifacts from the feature branches would be nice
 
   AUTOMATIC_PROJECT_CREATION_PROPERTY = 'automatic_project_creation'
   MASTER_BRANCH_PROPERTY = 'master_branch'
   USE_MASTER_PROJECT_NAME_PROPERTY = 'use_master_project_name'
   DESCRIPTION_PROPERTY = 'description'
-
-  def initialize(*args)
-    super
-    load
-  end
 
   def automatic_project_creation?
     !!@automatic_project_creation
@@ -32,64 +24,41 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
     @description || "Automatically created by Gitlab Web Hook plugin"
   end
 
-  def load
-    return unless configFile.file.exists()
-
-    doc = REXML::Document.new(File.new(configFile.file.canonicalPath))
-    if doc.root
-      @automatic_project_creation   = read_property(doc, AUTOMATIC_PROJECT_CREATION_PROPERTY) == "true"
-      @use_master_project_name      = read_property(doc, USE_MASTER_PROJECT_NAME_PROPERTY) == "true"
-      @master_branch                = read_property(doc, MASTER_BRANCH_PROPERTY)
-      @description                  = read_property(doc, DESCRIPTION_PROPERTY)
-      @templates                    = get_templates doc.root.elements['templates']
-      @group_templates              = get_templates doc.root.elements['group_templates']
-      @template                     = doc.root.elements['template'] && doc.root.elements['template'].text
-    end
+  # TODO: make private after merging
+  def load_xml(xmlroot)
+      @automatic_project_creation   = read_property(xmlroot, AUTOMATIC_PROJECT_CREATION_PROPERTY) == "true"
+      @use_master_project_name      = read_property(xmlroot, USE_MASTER_PROJECT_NAME_PROPERTY) == "true"
+      @master_branch                = read_property(xmlroot, MASTER_BRANCH_PROPERTY)
+      @description                  = read_property(xmlroot, DESCRIPTION_PROPERTY)
+      @templates                    = get_templates xmlroot.elements['templates']
+      @group_templates              = get_templates xmlroot.elements['group_templates']
+      @template                     = xmlroot.elements['template'] && xmlroot.elements['template'].text
   end
 
-  def configure(req, form)
-    parse(form)
-    save
-  end
+  # TODO: make private after merging
+  def store_xml(xmlroot)
 
-  def save
-    return if BulkChange.contains(self)
+    write_property(xmlroot, AUTOMATIC_PROJECT_CREATION_PROPERTY, automatic_project_creation?)
+    write_property(xmlroot, MASTER_BRANCH_PROPERTY, master_branch)
+    write_property(xmlroot, USE_MASTER_PROJECT_NAME_PROPERTY, use_master_project_name?)
+    write_property(xmlroot, DESCRIPTION_PROPERTY, description)
 
-    doc = REXML::Document.new
-    doc.add_element('hudson.model.Descriptor', {"plugin" => "gitlab-hook"})
+    xmlroot.add_element( 'template' ).add_text( template_fallback )
 
-    write_property(doc, AUTOMATIC_PROJECT_CREATION_PROPERTY, automatic_project_creation?)
-    write_property(doc, MASTER_BRANCH_PROPERTY, master_branch)
-    write_property(doc, USE_MASTER_PROJECT_NAME_PROPERTY, use_master_project_name?)
-    write_property(doc, DESCRIPTION_PROPERTY, description)
-
-    doc.root.add_element( 'template' ).add_text( template_fallback )
-
-    tpls = doc.root.add_element( 'templates' )
+    tpls = xmlroot.add_element( 'templates' )
     templated_jobs.each do |k,v|
       new = tpls.add_element('template')
       new.add_element('string').add_text(k)
       new.add_element('project').add_text(v)
     end
 
-    tpls = doc.root.add_element( 'group_templates' )
+    tpls = xmlroot.add_element( 'group_templates' )
     templated_groups.each do |k,v|
       new = tpls.add_element('template')
       new.add_element('string').add_text(k)
       new.add_element('project').add_text(v)
     end
 
-    f = File.open(configFile.file.canonicalPath, 'wb')
-    f.puts("<?xml version='#{doc.version}' encoding='#{doc.encoding}'?>")
-
-    formatter = REXML::Formatters::Pretty.new
-    formatter.compact = true
-    formatter.write(doc, f)
-
-    f.close
-
-    SaveableListener.fireOnChange(self, configFile)
-    f.closed?
   end
 
   def templated_jobs
@@ -134,11 +103,11 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
     end
   end
 
-  def read_property(doc, property)
-    doc.root.elements[property].text
+  def read_property(docroot, property)
+    docroot.elements[property].text
   end
 
-  def write_property(doc, property, value)
-    doc.root.add_element(property).add_text(value.to_s)
+  def write_property(docroot, property, value)
+    docroot.add_element(property).add_text(value.to_s)
   end
 end
