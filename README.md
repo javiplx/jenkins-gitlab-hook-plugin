@@ -1,7 +1,7 @@
 # Jenkins Gitlab Hook Plugin
 
-[![Build Status](https://api.travis-ci.org/javiplx/jenkins-gitlab-hook-plugin.svg)](https://travis-ci.org/javiplx/jenkins-gitlab-hook-plugin)
-[![Coverage Status](https://img.shields.io/coveralls/javiplx/jenkins-gitlab-hook-plugin.svg)](https://coveralls.io/r/javiplx/jenkins-gitlab-hook-plugin)
+[![Build Status](https://api.travis-ci.org/javiplx/jenkins-gitlab-hook-plugin.svg?branch=master)](https://travis-ci.org/javiplx/jenkins-gitlab-hook-plugin)
+[![Coverage Status](https://coveralls.io/repos/javiplx/jenkins-gitlab-hook-plugin/badge.svg?branch=master)](https://coveralls.io/r/javiplx/jenkins-gitlab-hook-plugin?branch=master)
 
 Enables Gitlab web hooks to be used to trigger SMC polling on Gitlab projects<br/>
 Plugin details can be found at https://wiki.jenkins-ci.org/display/JENKINS/Gitlab+Hook+Plugin
