@@ -21,7 +21,8 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
     project = GitlabWebHook::Project.new build.native.project
     client.name = repo_namespace(project)
     env = build.native.environment listener
-    client.post_status( env['GIT_COMMIT'] , 'running' , env['BUILD_URL'] )
+    sha = post_commit env['GIT_COMMIT'] , build, listener
+    client.post_status( sha , 'running' , env['BUILD_URL'] )
   end
 
   def perform(build, launcher, listener)
@@ -29,14 +30,8 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
     mr_id = client.merge_request(project)
     return if mr_id == -1 && descriptor.mr_status_only?
     env = build.native.environment listener
-    parents = StringIO.new
-    launcher.execute('git', 'log', '-1', '--oneline' ,'--format=%P', {:out => parents, :chdir => build.workspace} )
-    parents_a = parents.string.split
-    if parents_a.length == 1
-      client.post_status( env['GIT_COMMIT'] , build.native.result , env['BUILD_URL'] , descriptor.commit_status? ? nil : mr_id )
-    else
-      client.post_status( parents_a.last , build.native.result , env['BUILD_URL'] , descriptor.commit_status? ? nil : mr_id )
-    end
+    sha = post_commit env['GIT_COMMIT'] , build, listener
+    client.post_status( sha , build.native.result , env['BUILD_URL'] , descriptor.commit_status? ? nil : mr_id )
   end
 
   class GitlabNotifierDescriptor < Jenkins::Model::DefaultDescriptor
@@ -114,6 +109,15 @@ class GitlabNotifier < Jenkins::Tasks::Publisher
   describe_as Java.hudson.tasks.Publisher, :with => GitlabNotifierDescriptor
 
   private
+
+  def post_commit(current, build, listener)
+    gitlog = StringIO.new
+    launcher = build.workspace.create_launcher(listener)
+    launcher.execute('git', 'log', '-1', '--oneline' ,'--format=%P', {:out => gitlog, :chdir => build.workspace} )
+    parents = gitlog.string.split
+    parents[0] = current
+    parents.last
+  end
 
   def create_client
     @descriptor = Jenkins::Plugin.instance.descriptors[GitlabNotifier]
