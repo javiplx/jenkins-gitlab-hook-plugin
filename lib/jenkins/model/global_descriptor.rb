@@ -1,4 +1,5 @@
 require 'rexml/document'
+require 'jenkins/plugin'
 require 'jenkins/model/descriptor'
 
 module Jenkins::Model

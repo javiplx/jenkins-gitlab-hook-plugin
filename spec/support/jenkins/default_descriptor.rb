@@ -1,7 +1,12 @@
-# mocks extended stuff from Jenkins
+
+# explicitly require stuff from models root folder for proper inheritance
+if RUBY_PLATFORM == 'java'
+  require 'jenkins/model/global_descriptor'
+end
+
 module Jenkins
   module Model
-    class DefaultDescriptor
+    class GlobalDescriptor
       def configFile
         self
       end
@@ -11,12 +16,7 @@ module Jenkins
       def exists
         false
       end
-      def self.java_class
-        self
-      end
     end
   end
 end
 
-# explicitly require stuff from models root folder, due to above mock(s)
-require 'models/root_action_descriptor'

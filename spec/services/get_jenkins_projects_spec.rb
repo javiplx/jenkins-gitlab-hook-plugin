@@ -33,6 +33,7 @@ module GitlabWebHook
     context 'when fetching master project matching request details' do
       include_context 'projects'
       include_context 'details'
+      include_context 'settings'
 
       before(:each) { allow(subject).to receive(:all) { all_projects } }
 
