@@ -1,7 +1,9 @@
 
+require 'jenkins/model/global_descriptor'
+
 module Jenkins
   module Model
-    class DefaultDescriptor
+    class GlobalDescriptor
       def configFile
         self
       end
@@ -11,12 +13,7 @@ module Jenkins
       def exists
         false
       end
-      def self.java_class
-        self
-      end
     end
   end
 end
-
-require 'models/root_action_descriptor'
 
