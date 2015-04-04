@@ -1,6 +1,10 @@
 require 'spec_helper'
 
+require 'models/root_action_descriptor'
+
 describe GitlabWebHookRootActionDescriptor do
+
+    let(:subject) { GitlabWebHookRootActionDescriptor.new(:impl, :plugin, Java.hudson.model.Descriptor.java_class) }
 
     context 'whether automatic project creation is enabled' do
       it 'defines it' do
@@ -86,7 +90,6 @@ describe GitlabWebHookRootActionDescriptor do
 
       let(:xml_file) { double(exists: true, canonicalPath: 'spec/fixtures/descriptor.xml' ) }
       let(:config_file) { double('configFile', file: xml_file) }
-      let(:subject) { GitlabWebHookRootActionDescriptor.new }
 
       context 'read' do
 
@@ -137,9 +140,10 @@ describe GitlabWebHookRootActionDescriptor do
         it 'recovers disk content' do
           expect(subject).to receive(:configFile).and_return( config_file ).exactly(4).times
           subject.load
-          expect(BulkChange).to receive(:contains) { false }
+          expect(Java.hudson.BulkChange).to receive(:contains) { false }
           expect(File).to receive(:open) { outfile }
-          expect(SaveableListener).to receive(:fireOnChange)
+          expect(Java.hudson.model.listeners.SaveableListener).to receive(:fireOnChange)
+          expect(Jenkins::Plugin).to receive(:instance) { double(name: 'gitlab-hook') }
           subject.save
           expect(outfile.string).to eq content
         end

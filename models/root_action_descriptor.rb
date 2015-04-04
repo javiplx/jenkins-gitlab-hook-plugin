@@ -1,81 +1,6 @@
-require 'rexml/document'
+require 'jenkins/model/global_descriptor'
 
-java_import Java.hudson.BulkChange
-java_import Java.hudson.model.listeners.SaveableListener
-
-class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
-    # TODO a hook to delete artifacts from the feature branches would be nice
-
-    def initialize(*args)
-      super
-      load
-    end
-
-    def load
-      return unless configFile.file.exists()
-      xmlfile = File.new(configFile.file.canonicalPath)
-      xmldoc = REXML::Document.new(xmlfile)
-      if xmldoc.root
-
-        @automatic_project_creation = xmldoc.root.elements['automatic_project_creation'].text == "true" ? true : false
-        @use_master_project_name = xmldoc.root.elements['use_master_project_name'].text == "true" ? true : false
-
-        @master_branch = xmldoc.root.elements['master_branch'].text
-        @description = xmldoc.root.elements['description'].text
-        @any_branch_pattern = xmldoc.root.elements['any_branch_pattern'].text
-
-        @templates = get_templates xmldoc.root.elements['templates']
-        @group_templates = get_templates xmldoc.root.elements['group_templates']
-        @template = xmldoc.root.elements['template'] && xmldoc.root.elements['template'].text
-
-      end
-    end
-
-    def configure(req, form)
-      parse(form)
-      save
-    end
-
-    def save
-      return if BulkChange.contains(self)
-
-      doc = REXML::Document.new
-      doc.add_element( 'hudson.model.Descriptor' , { "plugin" => "gitlab-hook" } )
-
-      doc.root.add_element( 'automatic_project_creation' ).add_text( automatic_project_creation.to_s )
-      doc.root.add_element( 'master_branch' ).add_text( master_branch )
-      doc.root.add_element( 'use_master_project_name' ).add_text( use_master_project_name.to_s )
-      doc.root.add_element( 'description' ).add_text( description )
-      doc.root.add_element( 'any_branch_pattern' ).add_text( any_branch_pattern )
-
-      doc.root.add_element( 'template' ).add_text( template_fallback )
-
-      tpls = doc.root.add_element( 'templates' )
-      templated_jobs.each do |k,v|
-        new = tpls.add_element('template')
-        new.add_element('string').add_text(k)
-        new.add_element('project').add_text(v)
-      end
-
-      tpls = doc.root.add_element( 'group_templates' )
-      templated_groups.each do |k,v|
-        new = tpls.add_element('template')
-        new.add_element('string').add_text(k)
-        new.add_element('project').add_text(v)
-      end
-
-      f = File.open(configFile.file.canonicalPath, 'wb')
-      f.puts("<?xml version='#{doc.version}' encoding='#{doc.encoding}'?>")
-
-      formatter = REXML::Formatters::Pretty.new
-      formatter.compact = true
-      formatter.write doc, f
-
-      f.close
-
-      SaveableListener.fireOnChange(self, configFile)
-      f.closed?
-    end
+class GitlabWebHookRootActionDescriptor < Jenkins::Model::GlobalDescriptor
 
     def automatic_project_creation?
       automatic_project_creation
@@ -110,6 +35,43 @@ class GitlabWebHookRootActionDescriptor < Jenkins::Model::DefaultDescriptor
     end
 
     private
+
+    def load_xml(xmlroot)
+      @automatic_project_creation = xmlroot.elements['automatic_project_creation'].text == "true" ? true : false
+      @use_master_project_name = xmlroot.elements['use_master_project_name'].text == "true" ? true : false
+
+      @master_branch = xmlroot.elements['master_branch'].text
+      @description = xmlroot.elements['description'].text
+      @any_branch_pattern = xmlroot.elements['any_branch_pattern'].text
+
+      @templates = get_templates xmlroot.elements['templates']
+      @group_templates = get_templates xmlroot.elements['group_templates']
+      @template = xmlroot.elements['template'] && xmlroot.elements['template'].text
+    end
+
+    def store_xml(xmlroot)
+      xmlroot.add_element( 'automatic_project_creation' ).add_text( automatic_project_creation.to_s )
+      xmlroot.add_element( 'master_branch' ).add_text( master_branch )
+      xmlroot.add_element( 'use_master_project_name' ).add_text( use_master_project_name.to_s )
+      xmlroot.add_element( 'description' ).add_text( description )
+      xmlroot.add_element( 'any_branch_pattern' ).add_text( any_branch_pattern )
+
+      xmlroot.add_element( 'template' ).add_text( template_fallback )
+
+      tpls = xmlroot.add_element( 'templates' )
+      templated_jobs.each do |k,v|
+        new = tpls.add_element('template')
+        new.add_element('string').add_text(k)
+        new.add_element('project').add_text(v)
+      end
+
+      tpls = xmlroot.add_element( 'group_templates' )
+      templated_groups.each do |k,v|
+        new = tpls.add_element('template')
+        new.add_element('string').add_text(k)
+        new.add_element('project').add_text(v)
+      end
+    end
 
     def parse(form)
       @automatic_project_creation = form["autocreate"] ? true : false

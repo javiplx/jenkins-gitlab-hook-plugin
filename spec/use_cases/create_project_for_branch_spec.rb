@@ -7,11 +7,12 @@ module GitlabWebHook
     let(:master) { double(Project, name: 'discourse', jenkins_project: jenkins_project) }
     let(:get_jenkins_projects) { double(GetJenkinsProjects, master: master, named: []) }
     let(:subject) { CreateProjectForBranch.new(get_jenkins_projects) }
+    let(:global_descriptor) { GitlabWebHookRootActionDescriptor.new(:impl, :plugin, Java.hudson.model.Descriptor.java_class) }
     let(:jenkins_instance) { double(Java.jenkins.model.Jenkins) }
 
     before(:each) do
       allow(Java.jenkins.model.Jenkins).to receive(:instance) { jenkins_instance }
-      allow(jenkins_instance).to receive(:descriptor) { GitlabWebHookRootActionDescriptor.new }
+      allow(jenkins_instance).to receive(:descriptor) { global_descriptor }
     end
 
     context 'when not able to find a master project to copy from' do
