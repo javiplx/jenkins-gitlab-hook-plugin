@@ -8,6 +8,10 @@ class GitlabPushTrigger < Jenkins::Triggers::Trigger
     get_descriptor.queue.execute(PollRunner.new(self))
   end
 
+  def project_actions
+    [ GitlabPollAction.new(job)]
+  end
+
   def self.applicable?(type)
     type.is_a? Java::HudsonModel::Project
   end
