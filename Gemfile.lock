@@ -1,10 +1,16 @@
+GIT
+  remote: git://github.com/javiplx/jenkins.rb.git
+  revision: 405433f89525b03e18b966b079c95cfba00534e7
+  tag: v0.2.4.pre.5
+  specs:
+    jenkins-plugin-runtime (0.2.4.pre.5)
+      json
+      slop (~> 3.0.2)
+
 GEM
   remote: http://rubygems.org/
   specs:
     diff-lcs (1.2.5)
-    jenkins-plugin-runtime (0.2.3)
-      json
-      slop (~> 3.0.2)
     jenkins-war (1.514)
     jpi (0.4.0)
       bundler
@@ -44,7 +50,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  jenkins-plugin-runtime (~> 0.2.3)
+  jenkins-plugin-runtime!
   jpi (~> 0.4.0)
   rake
   rspec (>= 3.0.0)

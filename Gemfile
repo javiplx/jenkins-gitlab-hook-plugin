@@ -1,8 +1,6 @@
 source 'http://rubygems.org'
 
-# Use this line instead if you want to bundle from a local copy.
-#gem 'jenkins-plugin-runtime', :path => "#{File.dirname(__FILE__)}/../jenkins-plugin-runtime"
-gem 'jenkins-plugin-runtime', '~> 0.2.3'
+gem 'jenkins-plugin-runtime', :github => "javiplx/jenkins.rb", :tag => "v0.2.4.pre.5"
 
 # using sinatra to run the web hook
 gem 'sinatra'
