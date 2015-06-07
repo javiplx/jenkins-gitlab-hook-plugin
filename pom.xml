@@ -41,4 +41,8 @@
     </pluginRepository>
   </pluginRepositories>
 
+  <build>
+    <outputDirectory>lib</outputDirectory>
+  </build>
+
 </project>
