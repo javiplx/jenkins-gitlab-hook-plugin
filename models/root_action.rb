@@ -1,6 +1,6 @@
 require 'jenkins/rack'
+require 'jenkins/model/unprotected_root_action'
 
-require_relative 'unprotected_root_action'
 require_relative 'root_action_descriptor'
 require_relative 'api'
 

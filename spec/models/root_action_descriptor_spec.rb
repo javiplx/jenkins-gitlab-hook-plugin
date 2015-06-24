@@ -1,6 +1,12 @@
 require 'spec_helper'
 
+require 'jenkins/plugin'
+require 'models/root_action_descriptor'
+
 describe GitlabWebHookRootActionDescriptor do
+
+    let(:subject) { GitlabWebHookRootActionDescriptor.new(:impl, :plugin, Java.hudson.model.Descriptor.java_class) }
+
     context 'whether automatic project creation is enabled' do
       it 'defines it' do
         expect(subject).to respond_to(:automatic_project_creation?)
@@ -41,16 +47,6 @@ describe GitlabWebHookRootActionDescriptor do
       end
     end
 
-    context 'with any branch search pattern' do
-      it 'defines it' do
-        expect(subject).to respond_to(:any_branch_pattern)
-      end
-
-      it 'has default' do
-        expect(subject.any_branch_pattern).to eq('**')
-      end
-    end
-
     context '#template_fallback' do
       it 'is defined' do
         expect(subject).to respond_to(:template_fallback)
@@ -85,7 +81,6 @@ describe GitlabWebHookRootActionDescriptor do
 
       let(:xml_file) { double(exists: true, canonicalPath: 'spec/fixtures/descriptor.xml' ) }
       let(:config_file) { double('configFile', file: xml_file) }
-      let(:subject) { GitlabWebHookRootActionDescriptor.new }
 
       context 'read' do
 
@@ -110,10 +105,6 @@ describe GitlabWebHookRootActionDescriptor do
           expect(subject.description).to eq 'Alternate description'
         end
 
-        it '#any_branch_pattern' do
-          expect(subject.any_branch_pattern).to eq 'origin/*'
-        end
-
         it '#template_fallback' do
           expect(subject.template_fallback).to eq 'default_project'
         end
@@ -136,9 +127,10 @@ describe GitlabWebHookRootActionDescriptor do
         it 'recovers disk content' do
           expect(subject).to receive(:configFile).and_return( config_file ).exactly(4).times
           subject.load
-          expect(BulkChange).to receive(:contains) { false }
+          expect(Java.hudson.BulkChange).to receive(:contains) { false }
           expect(File).to receive(:open) { outfile }
-          expect(SaveableListener).to receive(:fireOnChange)
+          expect(Java.hudson.model.listeners.SaveableListener).to receive(:fireOnChange)
+          expect(Jenkins::Plugin).to receive(:instance) { double(name: 'gitlab-hook') }
           subject.save
           expect(outfile.string).to eq content
         end
