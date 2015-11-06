@@ -47,6 +47,7 @@ class Jenkins::Server
   def kill
     Process.kill 'TERM', job
     dump log, ' -> '
+    dump std, ' :: '
     Process.waitpid job, Process::WNOHANG
   rescue Errno::ECHILD => e
   ensure
