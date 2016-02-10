@@ -149,7 +149,7 @@ logger.info( "#{self}.match_scms #{scm}" )
         scm.repositories.find do |repo|
 logger.info( "      * #{repo}" )
           repo.getURIs().each do |project_repo_uri|
-logger.info( "        - #{project_repo_uri}" )
+logger.info( "        - #{details_uri.url} vs. #{project_repo_uri} = #{details_uri.matches?(project_repo_uri)}" )
           end
           repo.getURIs().find do |project_repo_uri|
             details_uri.matches?(project_repo_uri)
