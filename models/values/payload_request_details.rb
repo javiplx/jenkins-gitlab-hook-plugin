@@ -12,8 +12,8 @@ module GitlabWebHook
     end
 
     def repository_url
-      if payload["project"] && payload["project"]["git_http_url"]
-        payload["project"]["git_http_url"].strip
+      if payload["project"] && payload["project"]["git_ssh_url"]
+        payload["project"]["git_ssh_url"].strip
       elsif payload["repository"] && payload["repository"]["url"]
         payload["repository"]["url"].strip
       else
