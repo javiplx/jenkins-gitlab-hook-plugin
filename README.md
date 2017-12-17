@@ -260,5 +260,5 @@ To test locally in Jenkins
 - Extract and run `java -jar jenkins.war`
 - Upload `pkg/gitlab-hook-nojenkinscommits.hpi` into Jenkins manual install interface
 
-Example post bodies are available on the [gitlab webhook page](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/web_hooks/web_hooks.md)
+Example post bodies are available on the [gitlab webhook page](https://gitlab.com/gitlab-org/gitlab-ce/blob/master/doc/user/project/integrations/webhooks.md)
 
