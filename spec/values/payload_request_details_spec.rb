@@ -21,6 +21,7 @@ module GitlabWebHook
       end
 
       it 'returns empty when no repository details found' do
+        payload.delete('project')
         payload.delete('repository')
         expect(subject.repository_url).to eq('')
       end
@@ -32,6 +33,7 @@ module GitlabWebHook
       end
 
       it 'returns empty when no repository details found' do
+        payload.delete('project')
         payload.delete('repository')
         expect(subject.repository_name).to eq('')
       end
@@ -43,6 +45,7 @@ module GitlabWebHook
       end
 
       it 'returns empty when no repository details found' do
+        payload.delete('project')
         payload.delete('repository')
         expect(subject.repository_homepage).to eq('')
       end
