@@ -1,13 +1,13 @@
 require 'fileutils'
 
-def phantom(version='1.9.2')
+def phantom(version='1.9.8')
 
   exe = `which phantomjs 2>/dev/null`.chomp
   return exe unless exe.empty?
 
   arch , os = RUBY_PLATFORM.split '-'
   name = "phantomjs-#{version}-#{os}-#{arch}"
-  url = "http://phantomjs.googlecode.com/files/#{name}.tar.bz2"
+  url = "https://bitbucket.org/ariya/phantomjs/downloads/#{name}.tar.bz2"
 
   File.join(Bundler.user_bundle_path, name, 'bin/phantomjs').tap do |exe|
     unless File.exists? exe

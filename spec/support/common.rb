@@ -36,10 +36,10 @@ end
 def download_war(version, warname='jenkins.war')
   return if File.exists? warname
   puts "Downloading jenkins #{version} ..." if ENV['DEBUG']=='YES'
-  if [ "1.532.3" , "1.554.3" , "1.565.3" ].include? version
-    file = open "http://ks301030.kimsufi.com/war/#{version}/jenkins.war"
-  else
+  if version == "latest"
     file = open "http://updates.jenkins-ci.org/download/war/#{version}/jenkins.war"
+  else
+    file = open "http://repo.jenkins-ci.org/releases/org/jenkins-ci/main/jenkins-war/#{version}/jenkins-war-#{version}.war"
   end
   FileUtils.cp file.path, warname
 end

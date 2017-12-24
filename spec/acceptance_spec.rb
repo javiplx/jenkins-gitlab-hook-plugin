@@ -6,6 +6,8 @@ require 'pathname'
 
 Autologin.enable
 
+$stdout.sync = true
+
 feature 'GitLab 7.x' do
 
   testrepodir = Dir.mktmpdir [ 'testrepo' , '.git' ]
@@ -624,4 +626,3 @@ feature 'GitLab 8.x' do
   end
 
 end
-

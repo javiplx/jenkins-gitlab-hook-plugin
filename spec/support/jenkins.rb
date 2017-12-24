@@ -12,7 +12,7 @@ class Jenkins::Server
   attr_reader :workdir
   attr_reader :job, :std, :log
 
-  REQUIRED_CORE = '1.596.3'
+  REQUIRED_CORE = '1.651.3'
 
   def initialize
 
@@ -30,6 +30,16 @@ class Jenkins::Server
 
     # Dependencies for git 2.0
     FileUtils.mkdir_p "#{workdir}/plugins"
+    unless version.split('.').first == '1'
+      download_plugin 'credentials', '1.16.1', "#{workdir}/plugins"
+      download_plugin 'ssh-credentials', '1.7.1', "#{workdir}/plugins"
+      download_plugin 'matrix-project', '1.4.1', "#{workdir}/plugins"
+      download_plugin 'script-security', '1.13', "#{workdir}/plugins"
+      download_plugin 'junit', '1.2', "#{workdir}/plugins"
+      download_plugin 'mailer', '1.11', "#{workdir}/plugins"
+      download_plugin 'matrix-auth', '1.1', "#{workdir}/plugins"
+    end
+
     download_plugin 'scm-api', '0.1', "#{workdir}/plugins"
     download_plugin 'git-client', '1.4.4', "#{workdir}/plugins"
     download_plugin 'ssh-agent', '1.3', "#{workdir}/plugins"
@@ -42,7 +52,7 @@ class Jenkins::Server
     @job = fork do
       $stdout.reopen out
       $stderr.reopen err
-      ENV['JAVA_OPTS'] = "-XX:MaxPermSize=512m -Xms512m -Xmx1024m"
+      ENV['JAVA_OPTS'] = "-XX:MaxPermSize=512m -Xms512m -Xmx1024m -Djruby.compile.mode=OFF -Djruby.objectspace.enabled=false -Dhudson.DNSMultiCast.disabled=true"
       server.run!
     end
     Process.detach job
